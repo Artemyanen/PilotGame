@@ -2,6 +2,191 @@
 FuseBox.pkg("default", {}, function(___scope___){
 ___scope___.file("index.js", function(exports, require, module, __filename, __dirname){
 
+// import * as _ from 'underscore';
+"use strict";
+exports.__esModule = true;
+// interface IObject {
+//     x: number,
+//     y: number,
+//     color: string
+// }
+// class Block implements IObject {
+//     x: number;
+//     y: number;
+//     color: string;
+//     height: number = 64;
+//     width: number = 64;
+//     remove: boolean;
+//     constructor(x, y, color) {
+//         this.color = color;
+//         this.x = x;
+//         this.y = y;
+//         this.remove = false;
+//     }
+//     get shouldHaveBorder(): boolean {
+//         const downNeighbour = getObjectsIn(this.x, this.y + 64)[0];
+//         return (downNeighbour && this.color != downNeighbour.color || this.y == canvas.height - this.height);
+//     }
+//     getNeightbours() {
+//         const x = this.x;
+//         const y = this.y;
+//         return [
+//             getObjectsIn(x, y - 64)[0],
+//             getObjectsIn(x, y + 64)[0],
+//             getObjectsIn(x - 64, y)[0],
+//             getObjectsIn(x + 64, y)[0]].filter(q => q);
+//     }
+//     isDownPlaceEmpty() {
+//         return (getObjectsIn(this.x, this.y + 64)[0] == undefined && this.y < canvas.height - this.height)
+//     }
+//     update() {
+//         if (this.isDownPlaceEmpty())
+//             this.y += 8;
+//     }
+// }
+// const canvas = document.getElementById('MyCanvas');
+// const context = canvas.getContext('2d');
+// let dt: number;
+// let lastTime: number = 0;
+// let gameObjects: Block[] = [];
+// let isMoving = false;
+// const pulse = (millis): void => {
+//     if (lastTime != null && lastTime) {
+//         dt = ((millis - lastTime) / 1000);
+//         update();
+//     }
+//     lastTime = millis;
+//     window.requestAnimationFrame(pulse);
+// }
+// const update = () => {
+//     gameObjects = gameObjects.filter(q => q.remove == false);
+//     isMoving = gameObjects.filter(object => object.isDownPlaceEmpty()).length > 0;
+//     gameObjects.forEach(object => object.update());
+//     // gameObjects.some(q=>q.y ==0)
+//     context.clearRect(0, 0,canvas.width, canvas.height);
+//     context.fillStyle = '#806895';
+//     context.fillRect(0, 0, 384, 540);
+//     context.fillStyle = '#60427a';
+//     context.fillRect(64, 0, 384 - 128, 540);
+//     gameObjects.forEach((object, ind) => {
+//         context.fillStyle = object.color;
+//         context.fillRect(object.x, object.y, object.height, object.width);
+//     });
+// }
+// const getRandomColor = (): string => {
+//     const colors = ['#ff9e9d', '#f4eea6', '#3fb8af', '#ff3d7f'];
+//     let random = Math.floor(Math.random() * colors.length);
+//     return colors[random];
+// }
+// const createNewLine = () => {
+//     const size = 64;
+//     let y = canvas.height;
+//     while (true) {
+//         let lineObjects = new Array(4).fill(0).map((val, ind) => new Block(size * (ind + 1), y, getRandomColor()));
+//         let result = _.chain(lineObjects).groupBy(q => q.color).map(q => q.length).filter(q => q > 2).value().length == 0;
+//         if (result == false)
+//             continue;
+//         gameObjects = gameObjects.concat(lineObjects);
+//         break;
+//     }
+// }
+// const upOldLines = () => {
+//     gameObjects.forEach((block) => {
+//         block.y -= 64;
+//     });
+// }
+// const bfs = (startBlock: Block) => {
+//     let checked: Block[] = [];
+//     let queue: Block[] = [];
+//     let current: Block;
+//     queue.push(startBlock);
+//     checked.push(startBlock);
+//     while (queue.length) {
+//         current = queue.shift();
+//         current
+//             .getNeightbours()
+//             .filter(neigh => neigh.color == current.color)
+//             .forEach(neigh => {
+//                 if (checked.indexOf(neigh) == -1) {
+//                     queue.push(neigh);
+//                     checked.push(neigh);
+//                 }
+//             });
+//     }
+//     return checked;
+// };
+// const isTripleAvailable = (objects: Block[]): Block[][] => {
+//     return _.chain(objects)
+//         .filter(val => val.remove == false)
+//         .map(val => bfs(val))
+//         .filter(q => q.length > 2 && (rowCountMatch(q[0], 3, Direction.Horizontal) || rowCountMatch(q[0], 3, Direction.Vertical)))
+//         .map(val => _.chain(val).sortBy(q => q.x).sortBy(q => q.y).value())
+//         .groupBy(q => q[0].x + "|" + q[0].y).map(q => q[0])
+//         .value();
+// }
+// const sortObjects = (a: Block, b: Block): number => {
+//     return a.x == b.x && a.y == b.y && a.color == b.color ? 1 : 0;
+// }
+// const rowCountMatch = (block: Block, blocksInRowCount: number, direction: Direction): boolean => {
+//     return new Array(blocksInRowCount)
+//         .fill('x')
+//         .filter((_, ind) => {
+//             let x = direction == Direction.Horizontal ? block.x + (ind * block.width) : block.x;
+//             let y = direction == Direction.Vertical ? block.y + (ind * block.height) : block.y;
+//             let obj = getObjectsIn(x, y)[0];
+//             return (obj && obj.color == block.color);
+//         }).length == blocksInRowCount;
+// }
+// enum Direction {
+//     Vertical,
+//     Horizontal
+// }
+// const getObjectsIn = (x: number, y: number) => {
+//     return gameObjects.filter((object) => (y >= object.y && y < object.y + object.height
+//         && x >= object.x && x < object.x + object.width));
+// }
+// const timeout = async (wait: number): Promise<void> => new Promise<void>((res) => setTimeout(res, wait));
+// const waitForFalling = async (): Promise<boolean> => {
+//     while (true) {
+//         await timeout(100);
+//         if (isMoving == false)
+//             return true;
+//     }
+// }
+// let canvasLeftOffset = canvas.offsetLeft;
+// let canvasToptOffset = canvas.offsetTop;
+// document.addEventListener('click', async (event) => {
+//     const x = event.pageX - canvasLeftOffset;
+//     const y = event.pageY - canvasToptOffset;
+//     const clickedObject = getObjectsIn(x, y)[0];
+//     if (!clickedObject || isMoving)
+//         return;
+//     const sameColors = bfs(clickedObject);
+//     sameColors.forEach((val, ind) => val.remove = true);
+//     createNewLine();
+//     upOldLines();
+//     while (true) {
+//         await waitForFalling();
+//         const triples = isTripleAvailable(gameObjects);
+//         if (triples.length == 0)
+//             break;
+//         triples.forEach(val => val.forEach(q => q.remove = true));
+//     }
+//     if (gameObjects.length == 0)
+//         createNewLine();
+// });
+// new Array(2).fill(0).forEach(() => {
+//     createNewLine();
+//     upOldLines();
+// })
+// pulse(null);
+var Game_1 = require("./Core/Game");
+var game = new Game_1["default"]();
+game.start();
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("Core/Game.js", function(exports, require, module, __filename, __dirname){
+
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -38,23 +223,342 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
+exports.__esModule = true;
+var Canvas_1 = require("./Canvas");
+var ObjectManager_1 = require("../Objects/ObjectManager");
+var Game = (function () {
+    function Game() {
+        var _this = this;
+        this._lastTime = 0;
+        this.pulse = function (millis) {
+            if (_this._lastTime != null && _this._lastTime) {
+                Game.dt = ((millis - _this._lastTime) / 1000);
+                _this.update();
+            }
+            _this._lastTime = millis;
+            window.requestAnimationFrame(_this.pulse);
+        };
+        this._myCanvas = Canvas_1["default"].Instance;
+        this._manager = ObjectManager_1["default"].Instance;
+        this._canvasLeftOffset = this._myCanvas.Canvas.offsetLeft;
+        this._canvasToptOffset = this._myCanvas.Canvas.offsetTop;
+        this._manager.createStartLines();
+        this.initEventListener();
+    }
+    Game.prototype.initEventListener = function () {
+        var _this = this;
+        document.addEventListener('click', function (event) { return __awaiter(_this, void 0, void 0, function () {
+            var x, y, clickedObject, sameColors, triples;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        x = event.pageX - this._canvasLeftOffset;
+                        y = event.pageY - this._canvasToptOffset;
+                        clickedObject = this._manager.getObjectsIn(x, y)[0];
+                        if (!clickedObject || this._manager._isMoving)
+                            return [2 /*return*/];
+                        sameColors = this._manager.bfs(clickedObject);
+                        sameColors.forEach(function (val, ind) { return val.remove = true; });
+                        this._manager.createNewLine();
+                        this._manager.upOldLines();
+                        _a.label = 1;
+                    case 1:
+                        if (!true) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this._manager.waitForFalling()];
+                    case 2:
+                        _a.sent();
+                        triples = this._manager.isTripleAvailable();
+                        if (triples.length == 0)
+                            return [3 /*break*/, 3];
+                        triples.forEach(function (val) { return val.forEach(function (q) { return q.remove = true; }); });
+                        return [3 /*break*/, 1];
+                    case 3:
+                        if (this._manager.GameObjects.length == 0)
+                            this._manager.createNewLine();
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    };
+    Game.prototype.update = function () {
+        var _this = this;
+        this._manager.GameObjects = this._manager.GameObjects.filter(function (q) { return q.remove == false; });
+        this._manager._isMoving = this._manager.GameObjects.filter(function (object) { return object.isDownPlaceEmpty(); }).length > 0;
+        this._manager.GameObjects.forEach(function (object) { return object.update(); });
+        // gameObjects.some(q=>q.y ==0)
+        this._myCanvas.clearWindow();
+        this._myCanvas.drawBackground();
+        this._myCanvas.drawSideColumn();
+        this._manager.GameObjects.forEach(function (object) {
+            _this._myCanvas.drawBlock({ object: object });
+        });
+    };
+    Game.prototype.start = function () {
+        this.pulse(null);
+    };
+    return Game;
+}());
+exports["default"] = Game;
+//# sourceMappingURL=Game.js.map
+});
+___scope___.file("Core/Canvas.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+exports.__esModule = true;
+var Canvas = (function () {
+    function Canvas(width, height) {
+        this.initCanvas(width, height);
+    }
+    Object.defineProperty(Canvas, "Instance", {
+        get: function () {
+            if (Canvas._instance == null)
+                Canvas._instance = new Canvas(490, 640);
+            return Canvas._instance;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Canvas.prototype.initCanvas = function (width, height) {
+        this._height = height;
+        this._width = width;
+        document.body.innerHTML = "<canvas id='canvas' width='" + this._width + "' height='" + this._height + "' />";
+        this._canvas = document.getElementById("canvas");
+        this._context = this._canvas.getContext("2d");
+    };
+    Object.defineProperty(Canvas.prototype, "Width", {
+        get: function () { return this._width; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "Height", {
+        get: function () { return this._height; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "Canvas", {
+        get: function () { return this._canvas; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "Context", {
+        get: function () { return this._context; },
+        enumerable: true,
+        configurable: true
+    });
+    Canvas.prototype.drawBackground = function () {
+        this._context.fillStyle = '#806895';
+        this._context.fillRect(0, 0, this._width, this._height);
+    };
+    Canvas.prototype.drawSideColumn = function () {
+        this._context.fillStyle = '#60427a';
+        this._context.fillRect((this._width / 7) * 1.5, 0, this._width - (this._width / 7) * 3, this._height);
+    };
+    Canvas.prototype.drawBlock = function (_a) {
+        var object = _a.object;
+        this._context.fillStyle = object.color;
+        this._context.fillRect(object.x, object.y, object.height, object.width);
+    };
+    Canvas.prototype.clearWindow = function () {
+        this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
+    };
+    return Canvas;
+}());
+exports["default"] = Canvas;
+//# sourceMappingURL=Canvas.js.map
+});
+___scope___.file("Objects/ObjectManager.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t;
+    return { next: verb(0), "throw": verb(1), "return": verb(2) };
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 exports.__esModule = true;
 var _ = require("underscore");
+var Block_1 = require("./Block");
+var Canvas_1 = require("../Core/Canvas");
+var ObjectManager = (function () {
+    function ObjectManager() {
+        var _this = this;
+        this._gameObjects = [];
+        this._isMoving = false;
+        this.getRandomColor = function () {
+            var colors = ['#ff9e9d', '#f4eea6', '#3fb8af', '#ff3d7f'];
+            var random = Math.floor(Math.random() * colors.length);
+            return colors[random];
+        };
+        this.timeout = function (wait) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (res) { return setTimeout(res, wait); })];
+        }); }); };
+        this.waitForFalling = function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!true) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.timeout(100)];
+                    case 1:
+                        _a.sent();
+                        if (this._isMoving == false)
+                            return [2 /*return*/, true];
+                        return [3 /*break*/, 0];
+                    case 2: return [2 /*return*/];
+                }
+            });
+        }); };
+        this._myCanvas = Canvas_1["default"].Instance;
+    }
+    Object.defineProperty(ObjectManager, "Instance", {
+        get: function () {
+            if (ObjectManager._instance == null)
+                ObjectManager._instance = new ObjectManager();
+            return ObjectManager._instance;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ObjectManager.prototype, "GameObjects", {
+        get: function () { return this._gameObjects; },
+        set: function (gameObjects) { this._gameObjects = gameObjects; },
+        enumerable: true,
+        configurable: true
+    });
+    ObjectManager.prototype.sortObjects = function (a, b) {
+        return a.x == b.x && a.y == b.y && a.color == b.color ? 1 : 0;
+    };
+    ObjectManager.prototype.rowCountMatch = function (block, blocksInRowCount, direction) {
+        var _this = this;
+        return new Array(blocksInRowCount)
+            .fill('x')
+            .filter(function (_, ind) {
+            var x = direction == Direction.Horizontal ? block.x + (ind * block.width) : block.x;
+            var y = direction == Direction.Vertical ? block.y + (ind * block.height) : block.y;
+            var obj = _this.getObjectsIn(x, y)[0];
+            return (obj && obj.color == block.color);
+        }).length == blocksInRowCount;
+    };
+    ObjectManager.prototype.createStartLines = function () {
+        var _this = this;
+        new Array(2).fill(0).forEach(function () {
+            _this.createNewLine();
+            _this.upOldLines();
+        });
+    };
+    ObjectManager.prototype.createNewLine = function () {
+        var _this = this;
+        var size = Canvas_1["default"].Instance.Width / 7;
+        var y = this._myCanvas.Height;
+        while (true) {
+            var lineObjects = new Array(4).fill(0).map(function (val, ind) { return new Block_1["default"](size * (ind + 1.5), y, _this.getRandomColor()); });
+            var result = _.chain(lineObjects).groupBy(function (q) { return q.color; }).map(function (q) { return q.length; }).filter(function (q) { return q > 2; }).value().length == 0;
+            if (result == false)
+                continue;
+            this._gameObjects = this._gameObjects.concat(lineObjects);
+            break;
+        }
+    };
+    ObjectManager.prototype.upOldLines = function () {
+        this._gameObjects.forEach(function (block) {
+            block.y -= Canvas_1["default"].Instance.Width / 7;
+        });
+    };
+    ObjectManager.prototype.bfs = function (startBlock) {
+        var checked = [];
+        var queue = [];
+        var current;
+        queue.push(startBlock);
+        checked.push(startBlock);
+        while (queue.length) {
+            current = queue.shift();
+            current
+                .getNeightbours()
+                .filter(function (neigh) { return neigh.color == current.color; })
+                .forEach(function (neigh) {
+                if (checked.indexOf(neigh) == -1) {
+                    queue.push(neigh);
+                    checked.push(neigh);
+                }
+            });
+        }
+        return checked;
+    };
+    ;
+    ObjectManager.prototype.isTripleAvailable = function () {
+        var _this = this;
+        return _.chain(this._gameObjects)
+            .filter(function (val) { return val.remove == false; })
+            .map(function (val) { return _this.bfs(val); })
+            .filter(function (q) { return q.length > 2 && (_this.rowCountMatch(q[0], 3, Direction.Horizontal) || _this.rowCountMatch(q[0], 3, Direction.Vertical)); })
+            .map(function (val) { return _.chain(val).sortBy(function (q) { return q.x; }).sortBy(function (q) { return q.y; }).value(); })
+            .groupBy(function (q) { return q[0].x + "|" + q[0].y; }).map(function (q) { return q[0]; })
+            .value();
+    };
+    ObjectManager.prototype.getObjectsIn = function (x, y) {
+        return this._gameObjects.filter(function (object) { return (y >= object.y && y < object.y + object.height
+            && x >= object.x && x < object.x + object.width); });
+    };
+    return ObjectManager;
+}());
+var Direction;
+(function (Direction) {
+    Direction[Direction["Vertical"] = 0] = "Vertical";
+    Direction[Direction["Horizontal"] = 1] = "Horizontal";
+})(Direction || (Direction = {}));
+exports["default"] = ObjectManager;
+//# sourceMappingURL=ObjectManager.js.map
+});
+___scope___.file("Objects/Block.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+exports.__esModule = true;
+var Canvas_1 = require("../Core/Canvas");
+var ObjectManager_1 = require("./ObjectManager");
 var Block = (function () {
     function Block(x, y, color) {
-        this.height = 64;
-        this.width = 64;
-        this.neigh = [];
+        this.height = Canvas_1["default"].Instance.Width / 7;
+        this.width = Canvas_1["default"].Instance.Width / 7;
+        this._manager = ObjectManager_1["default"].Instance;
+        this._canvas = Canvas_1["default"].Instance;
         this.color = color;
         this.x = x;
         this.y = y;
         this.remove = false;
     }
-    Object.defineProperty(Block.prototype, "shouldHaveBorder", {
+    Object.defineProperty(Block.prototype, "ShouldHaveBorder", {
         get: function () {
-            var downNeighbour = getObjectsIn(this.x, this.y + 64)[0];
-            return (downNeighbour && this.color != downNeighbour.color || this.y == canvas.height - this.height);
+            var downNeighbour = this._manager.getObjectsIn(this.x, this.y + this.height)[0];
+            return (downNeighbour && this.color != downNeighbour.color ||
+                this.y == this._canvas.Height - this.height);
         },
         enumerable: true,
         configurable: true
@@ -62,184 +566,26 @@ var Block = (function () {
     Block.prototype.getNeightbours = function () {
         var x = this.x;
         var y = this.y;
+        var size = this.height;
         return [
-            getObjectsIn(x, y - 64)[0],
-            getObjectsIn(x, y + 64)[0],
-            getObjectsIn(x - 64, y)[0],
-            getObjectsIn(x + 64, y)[0]
+            this._manager.getObjectsIn(x, y - size)[0],
+            this._manager.getObjectsIn(x, y + size)[0],
+            this._manager.getObjectsIn(x - size, y)[0],
+            this._manager.getObjectsIn(x + size, y)[0]
         ].filter(function (q) { return q; });
     };
     Block.prototype.isDownPlaceEmpty = function () {
-        if (getObjectsIn(this.x, this.y + 64)[0] == undefined && this.y < canvas.height - this.height)
-            return true;
-        return false;
+        return (this._manager.getObjectsIn(this.x, this.y + this.height)[0] == undefined &&
+            this.y < this._canvas.Height - this.height);
     };
     Block.prototype.update = function () {
         if (this.isDownPlaceEmpty())
-            this.y += 8;
+            this.y += this.height / 8;
     };
     return Block;
 }());
-var canvas = document.getElementById('MyCanvas');
-var context = canvas.getContext('2d');
-var dt;
-var lastTime = 0;
-var gameObjects = [];
-var isMoving = false;
-var pulse = function (millis) {
-    if (lastTime != null && lastTime) {
-        dt = ((millis - lastTime) / 1000);
-        update();
-    }
-    lastTime = millis;
-    window.requestAnimationFrame(pulse);
-};
-var update = function () {
-    gameObjects = gameObjects.filter(function (q) { return q.remove == false; });
-    isMoving = gameObjects.filter(function (object) { return object.isDownPlaceEmpty(); }).length > 0;
-    gameObjects.forEach(function (object) { return object.update(); });
-    // gameObjects.some(q=>q.y ==0)
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = 'orange';
-    context.fillRect(0, 0, 384, 540);
-    context.fillStyle = 'grey';
-    context.fillRect(64, 0, 384 - 128, 540);
-    gameObjects.forEach(function (object, ind) {
-        context.fillStyle = object.color;
-        context.fillRect(object.x, object.y, object.height, object.width);
-    });
-};
-var getRandomColor = function () {
-    var colors = ['red', 'green', 'blue', 'yellow', 'purple', 'black'];
-    var random = Math.floor(Math.random() * colors.length);
-    return colors[random];
-};
-var createNewLine = function () {
-    var size = 64;
-    var y = canvas.height;
-    while (true) {
-        var lineObjects = new Array(4).fill(0).map(function (val, ind) { return new Block(size * (ind + 1), y, getRandomColor()); });
-        var result = _.chain(lineObjects).groupBy(function (q) { return q.color; }).map(function (q) { return q.length; }).filter(function (q) { return q > 2; }).value().length == 0;
-        if (result == false)
-            continue;
-        gameObjects = gameObjects.concat(lineObjects);
-        break;
-    }
-};
-var upOldLines = function () {
-    gameObjects.forEach(function (block) {
-        block.y -= 64;
-    });
-};
-var bfs = function (startBlock) {
-    var checked = [];
-    var queue = [];
-    var current;
-    queue.push(startBlock);
-    checked.push(startBlock);
-    while (queue.length) {
-        current = queue.shift();
-        current
-            .getNeightbours()
-            .filter(function (neigh) { return neigh.color == current.color; })
-            .forEach(function (neigh) {
-            if (checked.indexOf(neigh) == -1) {
-                queue.push(neigh);
-                checked.push(neigh);
-            }
-        });
-    }
-    return checked;
-};
-var isTripleAvailable = function (objects) {
-    return _.chain(objects)
-        .filter(function (val) { return val.remove == false; })
-        .map(function (val) { return bfs(val); })
-        .filter(function (q) { return q.length > 2 && (rowCountMatch(q[0], 3, Direction.Horizontal) || rowCountMatch(q[0], 3, Direction.Vertical)); })
-        .map(function (val) { return _.chain(val).sortBy(function (q) { return q.x; }).sortBy(function (q) { return q.y; }).value(); })
-        .groupBy(function (q) { return q[0].x + "|" + q[0].y; }).map(function (q) { return q[0]; })
-        .value();
-};
-var sortObjects = function (a, b) {
-    return a.x == b.x && a.y == b.y && a.color == b.color ? 1 : 0;
-};
-var rowCountMatch = function (block, blocksInRowCount, direction) {
-    return new Array(blocksInRowCount)
-        .fill('x')
-        .filter(function (_, ind) {
-        var x = direction == Direction.Horizontal ? block.x + (ind * block.width) : block.x;
-        var y = direction == Direction.Vertical ? block.y + (ind * block.height) : block.y;
-        var obj = getObjectsIn(x, y)[0];
-        return (obj && obj.color == block.color);
-    }).length == blocksInRowCount;
-};
-var Direction;
-(function (Direction) {
-    Direction[Direction["Vertical"] = 0] = "Vertical";
-    Direction[Direction["Horizontal"] = 1] = "Horizontal";
-})(Direction || (Direction = {}));
-var getObjectsIn = function (x, y) {
-    return gameObjects.filter(function (object) { return (y >= object.y && y < object.y + object.height
-        && x >= object.x && x < object.x + object.width); });
-};
-var timeout = function (wait) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-    return [2 /*return*/, new Promise(function (res) { return setTimeout(res, wait); })];
-}); }); };
-var waitForFalling = function () { return __awaiter(_this, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                if (!true) return [3 /*break*/, 2];
-                return [4 /*yield*/, timeout(100)];
-            case 1:
-                _a.sent();
-                if (isMoving == false)
-                    return [2 /*return*/, true];
-                return [3 /*break*/, 0];
-            case 2: return [2 /*return*/];
-        }
-    });
-}); };
-var canvasLeftOffset = canvas.offsetLeft;
-var canvasToptOffset = canvas.offsetTop;
-document.addEventListener('click', function (event) { return __awaiter(_this, void 0, void 0, function () {
-    var x, y, clickedObject, sameColors, triples;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                x = event.pageX - canvasLeftOffset;
-                y = event.pageY - canvasToptOffset;
-                clickedObject = getObjectsIn(x, y)[0];
-                if (!clickedObject || isMoving)
-                    return [2 /*return*/];
-                sameColors = bfs(clickedObject);
-                sameColors.forEach(function (val, ind) { return val.remove = true; });
-                createNewLine();
-                upOldLines();
-                _a.label = 1;
-            case 1:
-                if (!true) return [3 /*break*/, 3];
-                return [4 /*yield*/, waitForFalling()];
-            case 2:
-                _a.sent();
-                triples = isTripleAvailable(gameObjects);
-                if (triples.length == 0)
-                    return [3 /*break*/, 3];
-                triples.forEach(function (val) { return val.forEach(function (q) { return q.remove = true; }); });
-                return [3 /*break*/, 1];
-            case 3:
-                if (gameObjects.length == 0)
-                    createNewLine();
-                return [2 /*return*/];
-        }
-    });
-}); });
-new Array(2).fill(0).forEach(function () {
-    createNewLine();
-    upOldLines();
-});
-pulse(null);
-//# sourceMappingURL=index.js.map
+exports["default"] = Block;
+//# sourceMappingURL=Block.js.map
 });
 });
 FuseBox.pkg("fusebox-hot-reload", {}, function(___scope___){
