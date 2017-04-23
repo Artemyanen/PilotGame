@@ -90,8 +90,17 @@ const getRandomColor = ():string =>
 const createNewLine = () => {
     const size = 64;
     let y = canvas.height;
-    for(let _i = 0; _i < 4; _i++)
-        gameObjects.push(new Block(size*_i, y, getRandomColor()));
+    while(true)
+    {
+        let lineObjects = new Array(4).fill(0).map((val,ind)=>new Block(size*ind,y,getRandomColor()));
+        let result = _.chain(lineObjects).groupBy(q=>q.color).map(q=>q.length).filter(q=>q>2).value().length == 0;
+        
+        if(result == false)
+            continue;
+
+        gameObjects = gameObjects.concat(lineObjects);
+        break;
+    }
 }
 
 const upOldLines = () => {
@@ -138,7 +147,7 @@ const sortObjects = (a:Block,b:Block) : number=>
     return a.x == b.x && a.y == b.y && a.color == b.color ? 1 :0;
 }
 
-const rowCountMatch = (block:Block,blocksInRowCount:number,direction:Direction) =>
+const rowCountMatch = (block:Block,blocksInRowCount:number,direction:Direction) : boolean =>
 {
     let result:Block[] = [];
     new Array(blocksInRowCount)
@@ -192,7 +201,7 @@ document.addEventListener('click', (event)=>{
     // canClick = true;
 });
 
-new Array(6).fill(0).forEach(()=>
+new Array(8).fill(0).forEach(()=>
 {
     createNewLine();
     upOldLines();

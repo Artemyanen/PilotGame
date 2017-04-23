@@ -66,8 +66,14 @@ var getRandomColor = function () {
 var createNewLine = function () {
     var size = 64;
     var y = canvas.height;
-    for (var _i = 0; _i < 4; _i++)
-        gameObjects.push(new Block(size * _i, y, getRandomColor()));
+    while (true) {
+        var lineObjects = new Array(4).fill(0).map(function (val, ind) { return new Block(size * ind, y, getRandomColor()); });
+        var result = _.chain(lineObjects).groupBy(function (q) { return q.color; }).map(function (q) { return q.length; }).filter(function (q) { return q > 2; }).value().length == 0;
+        if (result == false)
+            continue;
+        gameObjects = gameObjects.concat(lineObjects);
+        break;
+    }
 };
 var upOldLines = function () {
     gameObjects.forEach(function (block) {
@@ -150,7 +156,7 @@ document.addEventListener('click', function (event) {
     isTripleAvailable(gameObjects);
     // canClick = true;
 });
-new Array(6).fill(0).forEach(function () {
+new Array(8).fill(0).forEach(function () {
     createNewLine();
     upOldLines();
 });
