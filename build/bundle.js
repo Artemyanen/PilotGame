@@ -51,6 +51,14 @@ var Block = (function () {
         this.y = y;
         this.remove = false;
     }
+    Object.defineProperty(Block.prototype, "shouldHaveBorder", {
+        get: function () {
+            var downNeighbour = getObjectsIn(this.x, this.y + 64)[0];
+            return (downNeighbour && this.color != downNeighbour.color || this.y == canvas.height - this.height);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Block.prototype.getNeightbours = function () {
         var x = this.x;
         var y = this.y;
@@ -92,21 +100,25 @@ var update = function () {
     gameObjects.forEach(function (object) { return object.update(); });
     // gameObjects.some(q=>q.y ==0)
     context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = 'orange';
+    context.fillRect(0, 0, 384, 540);
+    context.fillStyle = 'grey';
+    context.fillRect(64, 0, 384 - 128, 540);
     gameObjects.forEach(function (object, ind) {
         context.fillStyle = object.color;
         context.fillRect(object.x, object.y, object.height, object.width);
     });
 };
 var getRandomColor = function () {
-    var colors = ['red', 'green', 'blue'];
-    var random = Math.floor(Math.random() * 3);
+    var colors = ['red', 'green', 'blue', 'yellow', 'purple', 'black'];
+    var random = Math.floor(Math.random() * colors.length);
     return colors[random];
 };
 var createNewLine = function () {
     var size = 64;
     var y = canvas.height;
     while (true) {
-        var lineObjects = new Array(4).fill(0).map(function (val, ind) { return new Block(size * ind, y, getRandomColor()); });
+        var lineObjects = new Array(4).fill(0).map(function (val, ind) { return new Block(size * (ind + 1), y, getRandomColor()); });
         var result = _.chain(lineObjects).groupBy(function (q) { return q.color; }).map(function (q) { return q.length; }).filter(function (q) { return q > 2; }).value().length == 0;
         if (result == false)
             continue;
@@ -145,7 +157,8 @@ var isTripleAvailable = function (objects) {
         .map(function (val) { return bfs(val); })
         .filter(function (q) { return q.length > 2 && (rowCountMatch(q[0], 3, Direction.Horizontal) || rowCountMatch(q[0], 3, Direction.Vertical)); })
         .map(function (val) { return _.chain(val).sortBy(function (q) { return q.x; }).sortBy(function (q) { return q.y; }).value(); })
-        .groupBy(function (q) { return q[0].x + "|" + q[0].y; }).map(function (q) { return q[0]; }).value();
+        .groupBy(function (q) { return q[0].x + "|" + q[0].y; }).map(function (q) { return q[0]; })
+        .value();
 };
 var sortObjects = function (a, b) {
     return a.x == b.x && a.y == b.y && a.color == b.color ? 1 : 0;
@@ -197,7 +210,7 @@ document.addEventListener('click', function (event) { return __awaiter(_this, vo
                 x = event.pageX - canvasLeftOffset;
                 y = event.pageY - canvasToptOffset;
                 clickedObject = getObjectsIn(x, y)[0];
-                if (!clickedObject)
+                if (!clickedObject || isMoving)
                     return [2 /*return*/];
                 sameColors = bfs(clickedObject);
                 sameColors.forEach(function (val, ind) { return val.remove = true; });
