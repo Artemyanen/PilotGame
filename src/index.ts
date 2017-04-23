@@ -67,7 +67,6 @@ const pulse = (millis):void => {
     window.requestAnimationFrame(pulse);
 }
 
-
 const update = () => {
     gameObjects = gameObjects.filter(q=>q.remove == false);
 
@@ -94,7 +93,7 @@ const createNewLine = () => {
     {
         let lineObjects = new Array(4).fill(0).map((val,ind)=>new Block(size*ind,y,getRandomColor()));
         let result = _.chain(lineObjects).groupBy(q=>q.color).map(q=>q.length).filter(q=>q>2).value().length == 0;
-        
+
         if(result == false)
             continue;
 
@@ -155,14 +154,11 @@ const rowCountMatch = (block:Block,blocksInRowCount:number,direction:Direction) 
     .forEach((_,ind)=>
     {
         let obj : Block;
-        if(direction == Direction.Horizontal)
-            obj = getObjectsIn(block.x+(ind*block.width),block.y)[0];
-        else
-            obj = getObjectsIn(block.x,block.y+(ind*block.height))[0];
+        let x = direction == Direction.Horizontal ? block.x+(ind*block.width) : block.x;
+        let y = direction == Direction.Vertical ? block.y+(ind*block.height) : block.y;
+        obj  = getObjectsIn(x,y)[0];
         if(obj && obj.color == block.color)
             result.push(obj);
-        else
-            return false;
     });
     return result.length == blocksInRowCount;
 }
@@ -201,7 +197,7 @@ document.addEventListener('click', (event)=>{
     // canClick = true;
 });
 
-new Array(8).fill(0).forEach(()=>
+new Array(2).fill(0).forEach(()=>
 {
     createNewLine();
     upOldLines();

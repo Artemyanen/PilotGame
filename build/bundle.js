@@ -117,14 +117,11 @@ var rowCountMatch = function (block, blocksInRowCount, direction) {
         .fill('x')
         .forEach(function (_, ind) {
         var obj;
-        if (direction == Direction.Horizontal)
-            obj = getObjectsIn(block.x + (ind * block.width), block.y)[0];
-        else
-            obj = getObjectsIn(block.x, block.y + (ind * block.height))[0];
+        var x = direction == Direction.Horizontal ? block.x + (ind * block.width) : block.x;
+        var y = direction == Direction.Vertical ? block.y + (ind * block.height) : block.y;
+        obj = getObjectsIn(x, y)[0];
         if (obj && obj.color == block.color)
             result.push(obj);
-        else
-            return false;
     });
     return result.length == blocksInRowCount;
 };
@@ -156,7 +153,7 @@ document.addEventListener('click', function (event) {
     isTripleAvailable(gameObjects);
     // canClick = true;
 });
-new Array(8).fill(0).forEach(function () {
+new Array(2).fill(0).forEach(function () {
     createNewLine();
     upOldLines();
 });
