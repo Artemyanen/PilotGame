@@ -3,6 +3,42 @@ FuseBox.pkg("default", {}, function(___scope___){
 ___scope___.file("index.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t;
+    return { next: verb(0), "throw": verb(1), "return": verb(2) };
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var _this = this;
 exports.__esModule = true;
 var _ = require("underscore");
 var Block = (function () {
@@ -32,7 +68,7 @@ var Block = (function () {
     };
     Block.prototype.update = function () {
         if (this.isDownPlaceEmpty())
-            this.y += 16;
+            this.y += 8;
     };
     return Block;
 }());
@@ -41,6 +77,7 @@ var context = canvas.getContext('2d');
 var dt;
 var lastTime = 0;
 var gameObjects = [];
+var isMoving = false;
 var pulse = function (millis) {
     if (lastTime != null && lastTime) {
         dt = ((millis - lastTime) / 1000);
@@ -51,7 +88,9 @@ var pulse = function (millis) {
 };
 var update = function () {
     gameObjects = gameObjects.filter(function (q) { return q.remove == false; });
+    isMoving = gameObjects.filter(function (object) { return object.isDownPlaceEmpty(); }).length > 0;
     gameObjects.forEach(function (object) { return object.update(); });
+    // gameObjects.some(q=>q.y ==0)
     context.clearRect(0, 0, canvas.width, canvas.height);
     gameObjects.forEach(function (object, ind) {
         context.fillStyle = object.color;
@@ -106,7 +145,7 @@ var isTripleAvailable = function (objects) {
         .map(function (val) { return bfs(val); })
         .filter(function (q) { return q.length > 2 && (rowCountMatch(q[0], 3, Direction.Horizontal) || rowCountMatch(q[0], 3, Direction.Vertical)); })
         .map(function (val) { return _.chain(val).sortBy(function (q) { return q.x; }).sortBy(function (q) { return q.y; }).value(); })
-        .groupBy(function (q) { return q[0].x + "|" + q[0].y; }).map(function (q) { return q[0]; }).value().length > 0;
+        .groupBy(function (q) { return q[0].x + "|" + q[0].y; }).map(function (q) { return q[0]; }).value();
 };
 var sortObjects = function (a, b) {
     return a.x == b.x && a.y == b.y && a.color == b.color ? 1 : 0;
@@ -130,26 +169,59 @@ var getObjectsIn = function (x, y) {
     return gameObjects.filter(function (object) { return (y >= object.y && y < object.y + object.height
         && x >= object.x && x < object.x + object.width); });
 };
-// let canClick = true;
+var timeout = function (wait) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+    return [2 /*return*/, new Promise(function (res) { return setTimeout(res, wait); })];
+}); }); };
+var waitForFalling = function () { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (!true) return [3 /*break*/, 2];
+                return [4 /*yield*/, timeout(100)];
+            case 1:
+                _a.sent();
+                if (isMoving == false)
+                    return [2 /*return*/, true];
+                return [3 /*break*/, 0];
+            case 2: return [2 /*return*/];
+        }
+    });
+}); };
 var canvasLeftOffset = canvas.offsetLeft;
 var canvasToptOffset = canvas.offsetTop;
-document.addEventListener('click', function (event) {
-    var x = event.pageX - canvasLeftOffset;
-    var y = event.pageY - canvasToptOffset;
-    // if(canClick == false)
-    //     return;
-    // canClick = false;
-    var clickedObject = getObjectsIn(x, y)[0];
-    // if(!clickedObject)
-    //     return;
-    var sameColors = bfs(clickedObject);
-    sameColors.forEach(function (val, ind) { return val.remove = true; });
-    // createNewLine();
-    // upOldLines();
-    isTripleAvailable(gameObjects);
-    // canClick = true;
-});
-new Array(6).fill(0).forEach(function () {
+document.addEventListener('click', function (event) { return __awaiter(_this, void 0, void 0, function () {
+    var x, y, clickedObject, sameColors, triples;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                x = event.pageX - canvasLeftOffset;
+                y = event.pageY - canvasToptOffset;
+                clickedObject = getObjectsIn(x, y)[0];
+                if (!clickedObject)
+                    return [2 /*return*/];
+                sameColors = bfs(clickedObject);
+                sameColors.forEach(function (val, ind) { return val.remove = true; });
+                createNewLine();
+                upOldLines();
+                _a.label = 1;
+            case 1:
+                if (!true) return [3 /*break*/, 3];
+                return [4 /*yield*/, waitForFalling()];
+            case 2:
+                _a.sent();
+                triples = isTripleAvailable(gameObjects);
+                if (triples.length == 0)
+                    return [3 /*break*/, 3];
+                triples.forEach(function (val) { return val.forEach(function (q) { return q.remove = true; }); });
+                return [3 /*break*/, 1];
+            case 3:
+                if (gameObjects.length == 0)
+                    createNewLine();
+                return [2 /*return*/];
+        }
+    });
+}); });
+new Array(2).fill(0).forEach(function () {
     createNewLine();
     upOldLines();
 });

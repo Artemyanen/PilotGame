@@ -39,7 +39,7 @@ class Block implements IObject {
 
     update() {
         if (this.isDownPlaceEmpty())
-            this.y += 16;
+            this.y += 8;
     }
 
 }
@@ -50,6 +50,7 @@ const context = canvas.getContext('2d');
 let dt: number;
 let lastTime: number = 0;
 let gameObjects: Block[] = [];
+let isMoving = false;
 
 const pulse = (millis): void => {
     if (lastTime != null && lastTime) {
@@ -61,10 +62,12 @@ const pulse = (millis): void => {
 }
 
 const update = () => {
-    gameObjects = gameObjects.filter(q => q.remove == false);
 
+    gameObjects = gameObjects.filter(q => q.remove == false);
+    isMoving = gameObjects.filter(object=>object.isDownPlaceEmpty()).length > 0;
     gameObjects.forEach(object => object.update());
 
+    // gameObjects.some(q=>q.y ==0)
     context.clearRect(0, 0, canvas.width, canvas.height);
     gameObjects.forEach((object, ind) => {
         context.fillStyle = object.color;
@@ -120,13 +123,13 @@ const bfs = (startBlock: Block) => {
     return checked;
 };
 
-const isTripleAvailable = (objects: Block[]) => {
+const isTripleAvailable = (objects: Block[]):Block[][]=> {
     return _.chain(objects)
         .filter(val => val.remove == false)
         .map(val => bfs(val))
         .filter(q => q.length > 2 && (rowCountMatch(q[0], 3, Direction.Horizontal) || rowCountMatch(q[0], 3, Direction.Vertical)))
         .map(val => _.chain(val).sortBy(q => q.x).sortBy(q => q.y).value())
-        .groupBy(q => q[0].x + "|" + q[0].y).map(q => q[0]).value().length > 0;
+        .groupBy(q => q[0].x + "|" + q[0].y).map(q => q[0]).value();
 }
 
 const sortObjects = (a: Block, b: Block): number => {
@@ -154,29 +157,54 @@ const getObjectsIn = (x: number, y: number) => {
         && x >= object.x && x < object.x + object.width));
 }
 
-// let canClick = true;
+const timeout = async (wait:number) : Promise<void> => new Promise<void>((res)=>setTimeout(res,wait));
+
+const waitForFalling = async ():Promise<boolean> =>
+{
+    while(true)
+    {
+        await timeout(100);
+        if(isMoving == false)
+            return true;
+    }
+}
+
 let canvasLeftOffset = canvas.offsetLeft;
 let canvasToptOffset = canvas.offsetTop;
-document.addEventListener('click', (event) => {
+document.addEventListener('click', async (event) => {
     const x = event.pageX - canvasLeftOffset;
     const y = event.pageY - canvasToptOffset;
-    // if(canClick == false)
-    //     return;
-    // canClick = false;
+
     const clickedObject = getObjectsIn(x, y)[0];
-    // if(!clickedObject)
-    //     return;
+    if(!clickedObject)
+        return;
     const sameColors = bfs(clickedObject);
     sameColors.forEach((val, ind) => val.remove = true);
-    // createNewLine();
-    // upOldLines();
-    isTripleAvailable(gameObjects)
-
-
+    createNewLine();
+    upOldLines();
+    while(true)
+    {
+        await waitForFalling();
+        const triples = isTripleAvailable(gameObjects);
+        if(triples.length == 0)
+            break;
+        triples.forEach(val=>val.forEach(q=>q.remove = true));
+    }
+    if(gameObjects.length == 0)
+        createNewLine();
+        
     // canClick = true;
+    /*1) Click
+    2)Fall
+    3) New line
+    4)Up old lines
+    5)while
+        5.1)fall
+    */
 });
 
-new Array(6).fill(0).forEach(() => {
+
+new Array(2).fill(0).forEach(() => {
     createNewLine();
     upOldLines();
 })
