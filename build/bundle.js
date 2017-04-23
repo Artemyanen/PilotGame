@@ -112,18 +112,14 @@ var sortObjects = function (a, b) {
     return a.x == b.x && a.y == b.y && a.color == b.color ? 1 : 0;
 };
 var rowCountMatch = function (block, blocksInRowCount, direction) {
-    var result = [];
-    new Array(blocksInRowCount)
+    return new Array(blocksInRowCount)
         .fill('x')
-        .forEach(function (_, ind) {
-        var obj;
+        .filter(function (_, ind) {
         var x = direction == Direction.Horizontal ? block.x + (ind * block.width) : block.x;
         var y = direction == Direction.Vertical ? block.y + (ind * block.height) : block.y;
-        obj = getObjectsIn(x, y)[0];
-        if (obj && obj.color == block.color)
-            result.push(obj);
-    });
-    return result.length == blocksInRowCount;
+        var obj = getObjectsIn(x, y)[0];
+        return (obj && obj.color == block.color);
+    }).length == blocksInRowCount;
 };
 var Direction;
 (function (Direction) {
@@ -153,7 +149,7 @@ document.addEventListener('click', function (event) {
     isTripleAvailable(gameObjects);
     // canClick = true;
 });
-new Array(2).fill(0).forEach(function () {
+new Array(6).fill(0).forEach(function () {
     createNewLine();
     upOldLines();
 });
