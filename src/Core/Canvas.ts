@@ -1,3 +1,5 @@
+import Block from '../Objects/Block';
+
 class Canvas {
     private static _instance: Canvas;
     private _canvas: HTMLCanvasElement;
@@ -39,9 +41,13 @@ class Canvas {
         this._context.fillRect((this._width/7)*1.5, 0, this._width - (this._width/7)*3, this._height);
     }
 
-    public drawBlock({ object }): void {
-        this._context.fillStyle = object.color;
-        this._context.fillRect(object.x, object.y, object.height, object.width);
+    public drawBlock(object: Block): void {
+        this._context.fillStyle = object.color.normal;
+        this._context.fillRect(object.x, object.y, object.width,object.height);
+        if(object.ShouldHaveBorder) {
+            this._context.fillStyle = object.color.shadow;
+            this._context.fillRect(object.x, object.y + object.height/10 * 9,object.width ,object.height/10);
+        }
     }
 
     public clearWindow(): void {

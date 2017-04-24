@@ -2,184 +2,8 @@
 FuseBox.pkg("default", {}, function(___scope___){
 ___scope___.file("index.js", function(exports, require, module, __filename, __dirname){
 
-// import * as _ from 'underscore';
 "use strict";
 exports.__esModule = true;
-// interface IObject {
-//     x: number,
-//     y: number,
-//     color: string
-// }
-// class Block implements IObject {
-//     x: number;
-//     y: number;
-//     color: string;
-//     height: number = 64;
-//     width: number = 64;
-//     remove: boolean;
-//     constructor(x, y, color) {
-//         this.color = color;
-//         this.x = x;
-//         this.y = y;
-//         this.remove = false;
-//     }
-//     get shouldHaveBorder(): boolean {
-//         const downNeighbour = getObjectsIn(this.x, this.y + 64)[0];
-//         return (downNeighbour && this.color != downNeighbour.color || this.y == canvas.height - this.height);
-//     }
-//     getNeightbours() {
-//         const x = this.x;
-//         const y = this.y;
-//         return [
-//             getObjectsIn(x, y - 64)[0],
-//             getObjectsIn(x, y + 64)[0],
-//             getObjectsIn(x - 64, y)[0],
-//             getObjectsIn(x + 64, y)[0]].filter(q => q);
-//     }
-//     isDownPlaceEmpty() {
-//         return (getObjectsIn(this.x, this.y + 64)[0] == undefined && this.y < canvas.height - this.height)
-//     }
-//     update() {
-//         if (this.isDownPlaceEmpty())
-//             this.y += 8;
-//     }
-// }
-// const canvas = document.getElementById('MyCanvas');
-// const context = canvas.getContext('2d');
-// let dt: number;
-// let lastTime: number = 0;
-// let gameObjects: Block[] = [];
-// let isMoving = false;
-// const pulse = (millis): void => {
-//     if (lastTime != null && lastTime) {
-//         dt = ((millis - lastTime) / 1000);
-//         update();
-//     }
-//     lastTime = millis;
-//     window.requestAnimationFrame(pulse);
-// }
-// const update = () => {
-//     gameObjects = gameObjects.filter(q => q.remove == false);
-//     isMoving = gameObjects.filter(object => object.isDownPlaceEmpty()).length > 0;
-//     gameObjects.forEach(object => object.update());
-//     // gameObjects.some(q=>q.y ==0)
-//     context.clearRect(0, 0,canvas.width, canvas.height);
-//     context.fillStyle = '#806895';
-//     context.fillRect(0, 0, 384, 540);
-//     context.fillStyle = '#60427a';
-//     context.fillRect(64, 0, 384 - 128, 540);
-//     gameObjects.forEach((object, ind) => {
-//         context.fillStyle = object.color;
-//         context.fillRect(object.x, object.y, object.height, object.width);
-//     });
-// }
-// const getRandomColor = (): string => {
-//     const colors = ['#ff9e9d', '#f4eea6', '#3fb8af', '#ff3d7f'];
-//     let random = Math.floor(Math.random() * colors.length);
-//     return colors[random];
-// }
-// const createNewLine = () => {
-//     const size = 64;
-//     let y = canvas.height;
-//     while (true) {
-//         let lineObjects = new Array(4).fill(0).map((val, ind) => new Block(size * (ind + 1), y, getRandomColor()));
-//         let result = _.chain(lineObjects).groupBy(q => q.color).map(q => q.length).filter(q => q > 2).value().length == 0;
-//         if (result == false)
-//             continue;
-//         gameObjects = gameObjects.concat(lineObjects);
-//         break;
-//     }
-// }
-// const upOldLines = () => {
-//     gameObjects.forEach((block) => {
-//         block.y -= 64;
-//     });
-// }
-// const bfs = (startBlock: Block) => {
-//     let checked: Block[] = [];
-//     let queue: Block[] = [];
-//     let current: Block;
-//     queue.push(startBlock);
-//     checked.push(startBlock);
-//     while (queue.length) {
-//         current = queue.shift();
-//         current
-//             .getNeightbours()
-//             .filter(neigh => neigh.color == current.color)
-//             .forEach(neigh => {
-//                 if (checked.indexOf(neigh) == -1) {
-//                     queue.push(neigh);
-//                     checked.push(neigh);
-//                 }
-//             });
-//     }
-//     return checked;
-// };
-// const isTripleAvailable = (objects: Block[]): Block[][] => {
-//     return _.chain(objects)
-//         .filter(val => val.remove == false)
-//         .map(val => bfs(val))
-//         .filter(q => q.length > 2 && (rowCountMatch(q[0], 3, Direction.Horizontal) || rowCountMatch(q[0], 3, Direction.Vertical)))
-//         .map(val => _.chain(val).sortBy(q => q.x).sortBy(q => q.y).value())
-//         .groupBy(q => q[0].x + "|" + q[0].y).map(q => q[0])
-//         .value();
-// }
-// const sortObjects = (a: Block, b: Block): number => {
-//     return a.x == b.x && a.y == b.y && a.color == b.color ? 1 : 0;
-// }
-// const rowCountMatch = (block: Block, blocksInRowCount: number, direction: Direction): boolean => {
-//     return new Array(blocksInRowCount)
-//         .fill('x')
-//         .filter((_, ind) => {
-//             let x = direction == Direction.Horizontal ? block.x + (ind * block.width) : block.x;
-//             let y = direction == Direction.Vertical ? block.y + (ind * block.height) : block.y;
-//             let obj = getObjectsIn(x, y)[0];
-//             return (obj && obj.color == block.color);
-//         }).length == blocksInRowCount;
-// }
-// enum Direction {
-//     Vertical,
-//     Horizontal
-// }
-// const getObjectsIn = (x: number, y: number) => {
-//     return gameObjects.filter((object) => (y >= object.y && y < object.y + object.height
-//         && x >= object.x && x < object.x + object.width));
-// }
-// const timeout = async (wait: number): Promise<void> => new Promise<void>((res) => setTimeout(res, wait));
-// const waitForFalling = async (): Promise<boolean> => {
-//     while (true) {
-//         await timeout(100);
-//         if (isMoving == false)
-//             return true;
-//     }
-// }
-// let canvasLeftOffset = canvas.offsetLeft;
-// let canvasToptOffset = canvas.offsetTop;
-// document.addEventListener('click', async (event) => {
-//     const x = event.pageX - canvasLeftOffset;
-//     const y = event.pageY - canvasToptOffset;
-//     const clickedObject = getObjectsIn(x, y)[0];
-//     if (!clickedObject || isMoving)
-//         return;
-//     const sameColors = bfs(clickedObject);
-//     sameColors.forEach((val, ind) => val.remove = true);
-//     createNewLine();
-//     upOldLines();
-//     while (true) {
-//         await waitForFalling();
-//         const triples = isTripleAvailable(gameObjects);
-//         if (triples.length == 0)
-//             break;
-//         triples.forEach(val => val.forEach(q => q.remove = true));
-//     }
-//     if (gameObjects.length == 0)
-//         createNewLine();
-// });
-// new Array(2).fill(0).forEach(() => {
-//     createNewLine();
-//     upOldLines();
-// })
-// pulse(null);
 var Game_1 = require("./Core/Game");
 var game = new Game_1["default"]();
 game.start();
@@ -290,7 +114,7 @@ var Game = (function () {
         this._myCanvas.drawBackground();
         this._myCanvas.drawSideColumn();
         this._manager.GameObjects.forEach(function (object) {
-            _this._myCanvas.drawBlock({ object: object });
+            _this._myCanvas.drawBlock(object);
         });
     };
     Game.prototype.start = function () {
@@ -353,10 +177,13 @@ var Canvas = (function () {
         this._context.fillStyle = '#60427a';
         this._context.fillRect((this._width / 7) * 1.5, 0, this._width - (this._width / 7) * 3, this._height);
     };
-    Canvas.prototype.drawBlock = function (_a) {
-        var object = _a.object;
-        this._context.fillStyle = object.color;
-        this._context.fillRect(object.x, object.y, object.height, object.width);
+    Canvas.prototype.drawBlock = function (object) {
+        this._context.fillStyle = object.color.normal;
+        this._context.fillRect(object.x, object.y, object.width, object.height);
+        if (object.ShouldHaveBorder) {
+            this._context.fillStyle = object.color.shadow;
+            this._context.fillRect(object.x, object.y + object.height / 10 * 9, object.width, object.height / 10);
+        }
     };
     Canvas.prototype.clearWindow = function () {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
@@ -408,15 +235,21 @@ exports.__esModule = true;
 var _ = require("underscore");
 var Block_1 = require("./Block");
 var Canvas_1 = require("../Core/Canvas");
+var Color_1 = require("./Color");
 var ObjectManager = (function () {
     function ObjectManager() {
         var _this = this;
         this._gameObjects = [];
         this._isMoving = false;
+        this._colors = [
+            new Color_1.Color('#ff9e9d', '#d57f88'),
+            new Color_1.Color('#f4eea6', '#ccc08f'),
+            new Color_1.Color('#3fb8af', '#359497'),
+            new Color_1.Color('#ff3d7f', '#d5316e')
+        ];
         this.getRandomColor = function () {
-            var colors = ['#ff9e9d', '#f4eea6', '#3fb8af', '#ff3d7f'];
-            var random = Math.floor(Math.random() * colors.length);
-            return colors[random];
+            var random = Math.floor(Math.random() * _this._colors.length);
+            return _this._colors[random];
         };
         this.timeout = function (wait) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
             return [2 /*return*/, new Promise(function (res) { return setTimeout(res, wait); })];
@@ -454,7 +287,7 @@ var ObjectManager = (function () {
         configurable: true
     });
     ObjectManager.prototype.sortObjects = function (a, b) {
-        return a.x == b.x && a.y == b.y && a.color == b.color ? 1 : 0;
+        return a.x == b.x && a.y == b.y && a.color.normal == b.color.normal ? 1 : 0;
     };
     ObjectManager.prototype.rowCountMatch = function (block, blocksInRowCount, direction) {
         var _this = this;
@@ -464,7 +297,7 @@ var ObjectManager = (function () {
             var x = direction == Direction.Horizontal ? block.x + (ind * block.width) : block.x;
             var y = direction == Direction.Vertical ? block.y + (ind * block.height) : block.y;
             var obj = _this.getObjectsIn(x, y)[0];
-            return (obj && obj.color == block.color);
+            return (obj && obj.color.normal == block.color.normal);
         }).length == blocksInRowCount;
     };
     ObjectManager.prototype.createStartLines = function () {
@@ -479,8 +312,14 @@ var ObjectManager = (function () {
         var size = Canvas_1["default"].Instance.Width / 7;
         var y = this._myCanvas.Height;
         while (true) {
-            var lineObjects = new Array(4).fill(0).map(function (val, ind) { return new Block_1["default"](size * (ind + 1.5), y, _this.getRandomColor()); });
-            var result = _.chain(lineObjects).groupBy(function (q) { return q.color; }).map(function (q) { return q.length; }).filter(function (q) { return q > 2; }).value().length == 0;
+            var lineObjects = new Array(4)
+                .fill(0)
+                .map(function (val, ind) { return new Block_1["default"](size * (ind + 1.5), y, _this.getRandomColor()); });
+            var result = _.chain(lineObjects)
+                .groupBy(function (q) { return q.color.normal; })
+                .map(function (q) { return q.length; })
+                .filter(function (q) { return q > 2; })
+                .value().length == 0;
             if (result == false)
                 continue;
             this._gameObjects = this._gameObjects.concat(lineObjects);
@@ -502,7 +341,7 @@ var ObjectManager = (function () {
             current = queue.shift();
             current
                 .getNeightbours()
-                .filter(function (neigh) { return neigh.color == current.color; })
+                .filter(function (neigh) { return neigh.color.normal == current.color.normal; })
                 .forEach(function (neigh) {
                 if (checked.indexOf(neigh) == -1) {
                     queue.push(neigh);
@@ -518,7 +357,8 @@ var ObjectManager = (function () {
         return _.chain(this._gameObjects)
             .filter(function (val) { return val.remove == false; })
             .map(function (val) { return _this.bfs(val); })
-            .filter(function (q) { return q.length > 2 && (_this.rowCountMatch(q[0], 3, Direction.Horizontal) || _this.rowCountMatch(q[0], 3, Direction.Vertical)); })
+            .filter(function (q) { return q.length > 2 &&
+            (_this.rowCountMatch(q[0], 3, Direction.Horizontal) || _this.rowCountMatch(q[0], 3, Direction.Vertical)); })
             .map(function (val) { return _.chain(val).sortBy(function (q) { return q.x; }).sortBy(function (q) { return q.y; }).value(); })
             .groupBy(function (q) { return q[0].x + "|" + q[0].y; }).map(function (q) { return q[0]; })
             .value();
@@ -586,6 +426,20 @@ var Block = (function () {
 }());
 exports["default"] = Block;
 //# sourceMappingURL=Block.js.map
+});
+___scope___.file("Objects/Color.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+exports.__esModule = true;
+var Color = (function () {
+    function Color(normal, shadow) {
+        this.normal = normal;
+        this.shadow = shadow;
+    }
+    return Color;
+}());
+exports.Color = Color;
+//# sourceMappingURL=Color.js.map
 });
 });
 FuseBox.pkg("fusebox-hot-reload", {}, function(___scope___){

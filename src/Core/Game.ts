@@ -64,7 +64,7 @@ class Game {
         this._myCanvas.drawSideColumn();
 
         this._manager.GameObjects.forEach((object) => {
-            this._myCanvas.drawBlock({ object });
+            this._myCanvas.drawBlock(object);
             
         });
     }
