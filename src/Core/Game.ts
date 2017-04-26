@@ -4,31 +4,27 @@ import ObjectManager from '../Objects/ObjectManager';
 
 class Game {
     public static dt: number;
-    private _myCanvas: Canvas;
-    private _manager: ObjectManager;
+    private _myCanvas: Canvas  = Canvas.Instance;
+    private _manager: ObjectManager = ObjectManager.Instance;
     private _lastTime: number = 0;
-    private _canvasLeftOffset: number;
-    private _canvasToptOffset: number;
 
     constructor() {
-        this._myCanvas = Canvas.Instance;
-        this._manager = ObjectManager.Instance;
-        this._canvasLeftOffset = this._myCanvas.Canvas.offsetLeft;
-        this._canvasToptOffset = this._myCanvas.Canvas.offsetTop;
-
         this._manager.createStartLines();
         this.initEventListener();
     }
+
+    private get CanvasLeftOffset(): number{return this._myCanvas.Canvas.offsetLeft;}
+    private get CanvasToptOffset(): number{return this._myCanvas.Canvas.offsetTop;}
 
     private initEventListener() {
         document.addEventListener('click', this.gameProcessController);
     }
 
     private gameProcessController = async (event: MouseEvent) => {
-        const x = event.pageX - this._canvasLeftOffset;
-        const y = event.pageY - this._canvasToptOffset;
+        const x = event.pageX - this.CanvasLeftOffset;
+        const y = event.pageY - this.CanvasToptOffset;
 
-        const clickedObject = this._manager.getObjectsIn(x, y)[0];
+        const clickedObject = this._manager.getObjectIn(x, y);
         if (!clickedObject || this._manager._isMoving)
             return;
         const sameColors = this._manager.bfs(clickedObject);
@@ -45,9 +41,8 @@ class Game {
         if (this._manager.GameObjects.length == 0)
             this._manager.createNewLine();
 
-        if (this._manager.GameObjects.some(q => q.y < 0 + q.height)) {
+        if (this._manager.GameObjects.some(q => q.y < 0 + q.height)) 
             this.changeGameController(this.gameOverController, this.gameProcessController);
-        }
     }
 
     private gameOverController = (): void => {

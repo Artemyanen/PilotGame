@@ -53,15 +53,17 @@ var ObjectManager_1 = require("../Objects/ObjectManager");
 var Game = (function () {
     function Game() {
         var _this = this;
+        this._myCanvas = Canvas_1["default"].Instance;
+        this._manager = ObjectManager_1["default"].Instance;
         this._lastTime = 0;
         this.gameProcessController = function (event) { return __awaiter(_this, void 0, void 0, function () {
             var x, y, clickedObject, sameColors, triples;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        x = event.pageX - this._canvasLeftOffset;
-                        y = event.pageY - this._canvasToptOffset;
-                        clickedObject = this._manager.getObjectsIn(x, y)[0];
+                        x = event.pageX - this.CanvasLeftOffset;
+                        y = event.pageY - this.CanvasToptOffset;
+                        clickedObject = this._manager.getObjectIn(x, y);
                         if (!clickedObject || this._manager._isMoving)
                             return [2 /*return*/];
                         sameColors = this._manager.bfs(clickedObject);
@@ -82,9 +84,8 @@ var Game = (function () {
                     case 3:
                         if (this._manager.GameObjects.length == 0)
                             this._manager.createNewLine();
-                        if (this._manager.GameObjects.some(function (q) { return q.y < 0 + q.height; })) {
+                        if (this._manager.GameObjects.some(function (q) { return q.y < 0 + q.height; }))
                             this.changeGameController(this.gameOverController, this.gameProcessController);
-                        }
                         return [2 /*return*/];
                 }
             });
@@ -102,13 +103,19 @@ var Game = (function () {
             _this._lastTime = millis;
             window.requestAnimationFrame(_this.pulse);
         };
-        this._myCanvas = Canvas_1["default"].Instance;
-        this._manager = ObjectManager_1["default"].Instance;
-        this._canvasLeftOffset = this._myCanvas.Canvas.offsetLeft;
-        this._canvasToptOffset = this._myCanvas.Canvas.offsetTop;
         this._manager.createStartLines();
         this.initEventListener();
     }
+    Object.defineProperty(Game.prototype, "CanvasLeftOffset", {
+        get: function () { return this._myCanvas.Canvas.offsetLeft; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Game.prototype, "CanvasToptOffset", {
+        get: function () { return this._myCanvas.Canvas.offsetTop; },
+        enumerable: true,
+        configurable: true
+    });
     Game.prototype.initEventListener = function () {
         document.addEventListener('click', this.gameProcessController);
     };
@@ -252,6 +259,8 @@ var ObjectManager = (function () {
         var _this = this;
         this._gameObjects = [];
         this._isMoving = false;
+        this._startLinesCount = 2;
+        this._blocksPerRowCount = 4;
         this._colors = [
             new Color_1.Color('#ff9e9d', '#d57f88'),
             new Color_1.Color('#f4eea6', '#ccc08f'),
@@ -313,7 +322,7 @@ var ObjectManager = (function () {
     };
     ObjectManager.prototype.createStartLines = function () {
         var _this = this;
-        new Array(2).fill(0).forEach(function () {
+        new Array(this._startLinesCount).fill(0).forEach(function () {
             _this.createNewLine();
             _this.upOldLines();
         });
@@ -322,7 +331,7 @@ var ObjectManager = (function () {
         var _this = this;
         var size = Canvas_1["default"].Instance.Width / 7;
         while (true) {
-            var lineObjects = new Array(4)
+            var lineObjects = new Array(this._blocksPerRowCount)
                 .fill(0)
                 .map(function (val, ind) { return new Block_1["default"](size * (ind + 1.5), _this._myCanvas.Height, _this.getRandomColor()); });
             var result = _.chain(lineObjects)

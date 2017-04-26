@@ -8,7 +8,9 @@ class ObjectManager {
     private _gameObjects: Block[] = [];
     private static _instance: ObjectManager;
     private _myCanvas: Canvas;
-    public _isMoving = false;
+    public _isMoving : boolean = false;
+    private _startLinesCount : number = 2;
+    private _blocksPerRowCount : number = 4;
     private _colors: Color[] = [
         new Color('#ff9e9d', '#d57f88'),
         new Color('#f4eea6', '#ccc08f'),
@@ -52,7 +54,7 @@ class ObjectManager {
     private timeout = async (wait: number): Promise<void> => new Promise<void>((res) => setTimeout(res, wait));
 
     public createStartLines(): void {
-        new Array(2).fill(0).forEach(() => {
+        new Array(this._startLinesCount).fill(0).forEach(() => {
             this.createNewLine();
             this.upOldLines();
         })
@@ -61,7 +63,7 @@ class ObjectManager {
     public createNewLine(): void {
         const size = Canvas.Instance.Width / 7;
         while (true) {
-            let lineObjects = new Array(4)
+            let lineObjects = new Array(this._blocksPerRowCount)
                 .fill(0)
                 .map((val, ind) => new Block(size * (ind + 1.5), this._myCanvas.Height, this.getRandomColor()))
             let result = _.chain(lineObjects)
