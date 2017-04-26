@@ -307,7 +307,7 @@ var ObjectManager = (function () {
             .filter(function (_, ind) {
             var x = direction == Direction.Horizontal ? block.x + (ind * block.width) : block.x;
             var y = direction == Direction.Vertical ? block.y + (ind * block.height) : block.y;
-            var obj = _this.getObjectsIn(x, y)[0];
+            var obj = _this.getObjectIn(x, y);
             return (obj && obj.color.normal == block.color.normal);
         }).length == blocksInRowCount;
     };
@@ -321,15 +321,14 @@ var ObjectManager = (function () {
     ObjectManager.prototype.createNewLine = function () {
         var _this = this;
         var size = Canvas_1["default"].Instance.Width / 7;
-        var y = this._myCanvas.Height;
         while (true) {
             var lineObjects = new Array(4)
                 .fill(0)
-                .map(function (val, ind) { return new Block_1["default"](size * (ind + 1.5), y, _this.getRandomColor()); });
+                .map(function (val, ind) { return new Block_1["default"](size * (ind + 1.5), _this._myCanvas.Height, _this.getRandomColor()); });
             var result = _.chain(lineObjects)
-                .groupBy(function (q) { return q.color.normal; })
-                .map(function (q) { return q.length; })
-                .filter(function (q) { return q > 2; })
+                .groupBy(function (block) { return block.color.normal; })
+                .map(function (block) { return block.length; })
+                .filter(function (block) { return block > 2; })
                 .value().length == 0;
             if (result == false)
                 continue;
@@ -338,18 +337,15 @@ var ObjectManager = (function () {
         }
     };
     ObjectManager.prototype.upOldLines = function () {
-        this._gameObjects.forEach(function (block) {
-            block.y -= Canvas_1["default"].Instance.Width / 7;
-        });
+        this._gameObjects.forEach(function (block) { return block.y -= Canvas_1["default"].Instance.Width / 7; });
     };
     ObjectManager.prototype.bfs = function (startBlock) {
         var checked = [];
         var queue = [];
-        var current;
         queue.push(startBlock);
         checked.push(startBlock);
-        while (queue.length) {
-            current = queue.shift();
+        var _loop_1 = function () {
+            var current = queue.shift();
             current
                 .getNeightbours()
                 .filter(function (neigh) { return neigh.color.normal == current.color.normal; })
@@ -359,6 +355,9 @@ var ObjectManager = (function () {
                     checked.push(neigh);
                 }
             });
+        };
+        while (queue.length) {
+            _loop_1();
         }
         return checked;
     };
@@ -371,13 +370,15 @@ var ObjectManager = (function () {
             .filter(function (q) { return q.length > 2 &&
             (_this.rowCountMatch(q[0], 3, Direction.Horizontal) || _this.rowCountMatch(q[0], 3, Direction.Vertical)); })
             .map(function (val) { return _.chain(val).sortBy(function (q) { return q.x; }).sortBy(function (q) { return q.y; }).value(); })
-            .groupBy(function (q) { return q[0].x + "|" + q[0].y; }).map(function (q) { return q[0]; })
+            .groupBy(function (q) { return q[0].x + "|" + q[0].y; })
+            .map(function (q) { return q[0]; })
             .value();
     };
     ObjectManager.prototype.getObjectsIn = function (x, y) {
         return this._gameObjects.filter(function (object) { return (y >= object.y && y < object.y + object.height
             && x >= object.x && x < object.x + object.width); });
     };
+    ObjectManager.prototype.getObjectIn = function (x, y) { return this.getObjectsIn(x, y)[0]; };
     return ObjectManager;
 }());
 var Direction;
@@ -394,20 +395,21 @@ ___scope___.file("Objects/Block.js", function(exports, require, module, __filena
 exports.__esModule = true;
 var Canvas_1 = require("../Core/Canvas");
 var ObjectManager_1 = require("./ObjectManager");
+var Game_1 = require("../Core/Game");
 var Block = (function () {
     function Block(x, y, color) {
-        this.height = Canvas_1["default"].Instance.Width / 7;
-        this.width = Canvas_1["default"].Instance.Width / 7;
-        this._manager = ObjectManager_1["default"].Instance;
-        this._canvas = Canvas_1["default"].Instance;
-        this.color = color;
         this.x = x;
         this.y = y;
+        this.color = color;
+        this.height = Canvas_1["default"].Instance.Width / 7;
+        this.width = Canvas_1["default"].Instance.Width / 7;
         this.remove = false;
+        this._manager = ObjectManager_1["default"].Instance;
+        this._canvas = Canvas_1["default"].Instance;
     }
     Object.defineProperty(Block.prototype, "ShouldHaveBorder", {
         get: function () {
-            var downNeighbour = this._manager.getObjectsIn(this.x, this.y + this.height)[0];
+            var downNeighbour = this._manager.getObjectIn(this.x, this.y + this.height);
             return (downNeighbour && this.color != downNeighbour.color ||
                 this.y == this._canvas.Height - this.height);
         },
@@ -419,19 +421,20 @@ var Block = (function () {
         var y = this.y;
         var size = this.height;
         return [
-            this._manager.getObjectsIn(x, y - size)[0],
-            this._manager.getObjectsIn(x, y + size)[0],
-            this._manager.getObjectsIn(x - size, y)[0],
-            this._manager.getObjectsIn(x + size, y)[0]
+            this._manager.getObjectIn(x, y - size),
+            this._manager.getObjectIn(x, y + size),
+            this._manager.getObjectIn(x - size, y),
+            this._manager.getObjectIn(x + size, y)
         ].filter(function (q) { return q; });
     };
     Block.prototype.isDownPlaceEmpty = function () {
-        return (this._manager.getObjectsIn(this.x, this.y + this.height)[0] == undefined &&
+        return (this._manager.getObjectIn(this.x, this.y + this.height) == undefined &&
             this.y < this._canvas.Height - this.height);
     };
     Block.prototype.update = function () {
-        if (this.isDownPlaceEmpty())
-            this.y += this.height / 8;
+        if (this.isDownPlaceEmpty()) {
+            this.y += Math.floor(this.height * Game_1["default"].dt) * 6;
+        }
     };
     return Block;
 }());
