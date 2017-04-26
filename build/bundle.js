@@ -54,7 +54,7 @@ var Game = (function () {
     function Game() {
         var _this = this;
         this._lastTime = 0;
-        this.gameProcessControler = function (event) { return __awaiter(_this, void 0, void 0, function () {
+        this.gameProcessController = function (event) { return __awaiter(_this, void 0, void 0, function () {
             var x, y, clickedObject, sameColors, triples;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -83,14 +83,17 @@ var Game = (function () {
                         if (this._manager.GameObjects.length == 0)
                             this._manager.createNewLine();
                         if (this._manager.GameObjects.some(function (q) { return q.y < 0 + q.height; })) {
-                            //End of existing game
-                            document.removeEventListener('click', this.gameProcessControler);
-                            document.addEventListener('click', this.gameOverControler);
+                            this.changeGameController(this.gameOverController, this.gameProcessController);
                         }
                         return [2 /*return*/];
                 }
             });
         }); };
+        this.gameOverController = function () {
+            _this._manager.GameObjects.forEach(function (q) { return q.remove = true; });
+            _this._manager.createStartLines();
+            _this.changeGameController(_this.gameProcessController, _this.gameOverController);
+        };
         this.pulse = function (millis) {
             if (_this._lastTime != null && _this._lastTime) {
                 Game.dt = ((millis - _this._lastTime) / 1000);
@@ -107,12 +110,11 @@ var Game = (function () {
         this.initEventListener();
     }
     Game.prototype.initEventListener = function () {
-        document.addEventListener('click', this.gameProcessControler);
+        document.addEventListener('click', this.gameProcessController);
     };
-    Game.prototype.gameOverControler = function () {
-        //Start new Game
-        document.removeEventListener('click', this.gameOverControler);
-        document.addEventListener('click', this.gameProcessControler);
+    Game.prototype.changeGameController = function (on, off) {
+        document.removeEventListener('click', off);
+        document.addEventListener('click', on);
     };
     Game.prototype.update = function () {
         var _this = this;

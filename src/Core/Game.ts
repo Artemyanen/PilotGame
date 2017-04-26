@@ -21,10 +21,10 @@ class Game {
     }
 
     private initEventListener() {
-        document.addEventListener('click', this.gameProcessControler);
+        document.addEventListener('click', this.gameProcessController);
     }
 
-    private gameProcessControler = async (event: MouseEvent) => {
+    private gameProcessController = async (event: MouseEvent) => {
         const x = event.pageX - this._canvasLeftOffset;
         const y = event.pageY - this._canvasToptOffset;
 
@@ -46,16 +46,20 @@ class Game {
             this._manager.createNewLine();
 
         if (this._manager.GameObjects.some(q => q.y < 0 + q.height)) {
-            //End of existing game
-            document.removeEventListener('click', this.gameProcessControler);
-            document.addEventListener('click', this.gameOverControler);
+            this.changeGameController(this.gameOverController, this.gameProcessController);
         }
     }
 
-    private gameOverControler(): void {
-        //Start new Game
-        document.removeEventListener('click', this.gameOverControler);
-        document.addEventListener('click', this.gameProcessControler);
+    private gameOverController = (): void => {
+        this._manager.GameObjects.forEach(q => q.remove = true);
+        this._manager.createStartLines();
+
+        this.changeGameController(this.gameProcessController, this.gameOverController);
+    }
+    
+    private changeGameController(on: EventListenerOrEventListenerObject, off: EventListenerOrEventListenerObject): void {
+        document.removeEventListener('click', off);
+        document.addEventListener('click', on);
     }
 
     private pulse = (millis): void => {
