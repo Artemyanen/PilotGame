@@ -21,27 +21,41 @@ class Game {
     }
 
     private initEventListener() {
-        document.addEventListener('click', async (event) => {
-            const x = event.pageX - this._canvasLeftOffset;
-            const y = event.pageY - this._canvasToptOffset;
+        document.addEventListener('click', this.gameProcessControler);
+    }
 
-            const clickedObject = this._manager.getObjectsIn(x, y)[0];
-            if (!clickedObject || this._manager._isMoving)
-                return;
-            const sameColors = this._manager.bfs(clickedObject);
-            sameColors.forEach((val, ind) => val.remove = true);
+    private gameProcessControler = async (event: MouseEvent) => {
+        const x = event.pageX - this._canvasLeftOffset;
+        const y = event.pageY - this._canvasToptOffset;
+
+        const clickedObject = this._manager.getObjectsIn(x, y)[0];
+        if (!clickedObject || this._manager._isMoving)
+            return;
+        const sameColors = this._manager.bfs(clickedObject);
+        sameColors.forEach((val, ind) => val.remove = true);
+        this._manager.createNewLine();
+        this._manager.upOldLines();
+        while (true) {
+            await this._manager.waitForFalling();
+            const triples = this._manager.isTripleAvailable();
+            if (triples.length == 0)
+                break;
+            triples.forEach(val => val.forEach(q => q.remove = true));
+        }
+        if (this._manager.GameObjects.length == 0)
             this._manager.createNewLine();
-            this._manager.upOldLines();
-            while (true) {
-                await this._manager.waitForFalling();
-                const triples = this._manager.isTripleAvailable();
-                if (triples.length == 0)
-                    break;
-                triples.forEach(val => val.forEach(q => q.remove = true));
-            }
-            if (this._manager.GameObjects.length == 0)
-                this._manager.createNewLine();
-        });
+
+        if (this._manager.GameObjects.some(q => q.y < 0 + q.height)) {
+            //End of existing game
+            document.removeEventListener('click', this.gameProcessControler);
+            document.addEventListener('click', this.gameOverControler);
+        }
+    }
+
+    private gameOverControler(): void {
+        //Start new Game
+        document.removeEventListener('click', this.gameOverControler);
+        document.addEventListener('click', this.gameProcessControler);
     }
 
     private pulse = (millis): void => {
@@ -58,17 +72,15 @@ class Game {
         this._manager._isMoving = this._manager.GameObjects.filter(object => object.isDownPlaceEmpty()).length > 0;
         this._manager.GameObjects.forEach(object => object.update());
 
-        // gameObjects.some(q=>q.y ==0)
         this._myCanvas.clearWindow();
         this._myCanvas.drawBackground();
         this._myCanvas.drawSideColumn();
 
         this._manager.GameObjects.forEach((object) => {
             this._myCanvas.drawBlock(object);
-            
         });
     }
- 
+
     public start(): void {
         this.pulse(null);
     }

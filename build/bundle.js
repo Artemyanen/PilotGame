@@ -54,24 +54,7 @@ var Game = (function () {
     function Game() {
         var _this = this;
         this._lastTime = 0;
-        this.pulse = function (millis) {
-            if (_this._lastTime != null && _this._lastTime) {
-                Game.dt = ((millis - _this._lastTime) / 1000);
-                _this.update();
-            }
-            _this._lastTime = millis;
-            window.requestAnimationFrame(_this.pulse);
-        };
-        this._myCanvas = Canvas_1["default"].Instance;
-        this._manager = ObjectManager_1["default"].Instance;
-        this._canvasLeftOffset = this._myCanvas.Canvas.offsetLeft;
-        this._canvasToptOffset = this._myCanvas.Canvas.offsetTop;
-        this._manager.createStartLines();
-        this.initEventListener();
-    }
-    Game.prototype.initEventListener = function () {
-        var _this = this;
-        document.addEventListener('click', function (event) { return __awaiter(_this, void 0, void 0, function () {
+        this.gameProcessControler = function (event) { return __awaiter(_this, void 0, void 0, function () {
             var x, y, clickedObject, sameColors, triples;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -99,17 +82,43 @@ var Game = (function () {
                     case 3:
                         if (this._manager.GameObjects.length == 0)
                             this._manager.createNewLine();
+                        if (this._manager.GameObjects.some(function (q) { return q.y < 0 + q.height; })) {
+                            //End of existing game
+                            document.removeEventListener('click', this.gameProcessControler);
+                            document.addEventListener('click', this.gameOverControler);
+                        }
                         return [2 /*return*/];
                 }
             });
-        }); });
+        }); };
+        this.pulse = function (millis) {
+            if (_this._lastTime != null && _this._lastTime) {
+                Game.dt = ((millis - _this._lastTime) / 1000);
+                _this.update();
+            }
+            _this._lastTime = millis;
+            window.requestAnimationFrame(_this.pulse);
+        };
+        this._myCanvas = Canvas_1["default"].Instance;
+        this._manager = ObjectManager_1["default"].Instance;
+        this._canvasLeftOffset = this._myCanvas.Canvas.offsetLeft;
+        this._canvasToptOffset = this._myCanvas.Canvas.offsetTop;
+        this._manager.createStartLines();
+        this.initEventListener();
+    }
+    Game.prototype.initEventListener = function () {
+        document.addEventListener('click', this.gameProcessControler);
+    };
+    Game.prototype.gameOverControler = function () {
+        //Start new Game
+        document.removeEventListener('click', this.gameOverControler);
+        document.addEventListener('click', this.gameProcessControler);
     };
     Game.prototype.update = function () {
         var _this = this;
         this._manager.GameObjects = this._manager.GameObjects.filter(function (q) { return q.remove == false; });
         this._manager._isMoving = this._manager.GameObjects.filter(function (object) { return object.isDownPlaceEmpty(); }).length > 0;
         this._manager.GameObjects.forEach(function (object) { return object.update(); });
-        // gameObjects.some(q=>q.y ==0)
         this._myCanvas.clearWindow();
         this._myCanvas.drawBackground();
         this._myCanvas.drawSideColumn();
@@ -136,7 +145,7 @@ var Canvas = (function () {
     Object.defineProperty(Canvas, "Instance", {
         get: function () {
             if (Canvas._instance == null)
-                Canvas._instance = new Canvas(490, 640);
+                Canvas._instance = new Canvas(420, 640);
             return Canvas._instance;
         },
         enumerable: true,

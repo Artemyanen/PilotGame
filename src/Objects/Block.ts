@@ -1,18 +1,18 @@
 import Canvas from '../Core/Canvas';
 import ObjectManager from './ObjectManager';
-import {Color} from './Color';
+import { Color } from './Color';
 
 class Block implements IObject {
     public x: number;
     public y: number;
     public color: Color;
-    public height: number = Canvas.Instance.Width/7;
-    public width: number = Canvas.Instance.Width/7;
+    public height: number = Canvas.Instance.Width / 7;
+    public width: number = Canvas.Instance.Width / 7;
     public remove: boolean;
     private _manager: ObjectManager = ObjectManager.Instance;
     private _canvas: Canvas = Canvas.Instance;
 
-    constructor(x:number, y:number, color:Color) {
+    constructor(x: number, y: number, color: Color) {
         this.color = color;
         this.x = x;
         this.y = y;
@@ -42,7 +42,7 @@ class Block implements IObject {
 
     public update(): void {
         if (this.isDownPlaceEmpty())
-            this.y += this.height/8;
+            this.y += this.height / 8;
     }
 }
 

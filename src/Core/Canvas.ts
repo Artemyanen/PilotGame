@@ -9,7 +9,7 @@ class Canvas {
 
     static get Instance(): Canvas {
         if (Canvas._instance == null)
-            Canvas._instance = new Canvas(490, 640);
+            Canvas._instance = new Canvas(420, 640);
         return Canvas._instance;
     }
 
@@ -38,15 +38,15 @@ class Canvas {
 
     public drawSideColumn(): void {
         this._context.fillStyle = '#60427a';
-        this._context.fillRect((this._width/7)*1.5, 0, this._width - (this._width/7)*3, this._height);
+        this._context.fillRect((this._width / 7) * 1.5, 0, this._width - (this._width / 7) * 3, this._height);
     }
 
     public drawBlock(object: Block): void {
         this._context.fillStyle = object.color.normal;
-        this._context.fillRect(object.x, object.y, object.width,object.height);
-        if(object.ShouldHaveBorder) {
+        this._context.fillRect(object.x, object.y, object.width, object.height);
+        if (object.ShouldHaveBorder) {
             this._context.fillStyle = object.color.shadow;
-            this._context.fillRect(object.x, object.y + object.height/10 * 9,object.width ,object.height/10);
+            this._context.fillRect(object.x, object.y + object.height / 10 * 9, object.width, object.height / 10);
         }
     }
 

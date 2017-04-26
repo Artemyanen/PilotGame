@@ -2,19 +2,19 @@ import * as _ from 'underscore';
 import Block from './Block';
 import Canvas from '../Core/Canvas';
 import Game from '../Core/Game';
-import {Color} from './Color';
+import { Color } from './Color';
 
 class ObjectManager {
     private _gameObjects: Block[] = [];
     private static _instance: ObjectManager;
     private _myCanvas: Canvas;
     public _isMoving = false;
-    private _colors : Color[]= [
-        new Color('#ff9e9d','#d57f88'),
-        new Color('#f4eea6','#ccc08f'),
-        new Color('#3fb8af','#359497'),
-        new Color('#ff3d7f','#d5316e')
-        ];
+    private _colors: Color[] = [
+        new Color('#ff9e9d', '#d57f88'),
+        new Color('#f4eea6', '#ccc08f'),
+        new Color('#3fb8af', '#359497'),
+        new Color('#ff3d7f', '#d5316e')
+    ];
 
     static get Instance(): ObjectManager {
         if (ObjectManager._instance == null)
@@ -59,7 +59,7 @@ class ObjectManager {
     }
 
     public createNewLine(): void {
-        const size = Canvas.Instance.Width/7;
+        const size = Canvas.Instance.Width / 7;
         let y = this._myCanvas.Height;
         while (true) {
             let lineObjects = new Array(4)
@@ -81,7 +81,7 @@ class ObjectManager {
 
     public upOldLines(): void {
         this._gameObjects.forEach((block) => {
-            block.y -= Canvas.Instance.Width/7;
+            block.y -= Canvas.Instance.Width / 7;
         });
     }
 
@@ -97,8 +97,7 @@ class ObjectManager {
                 .getNeightbours()
                 .filter(neigh => neigh.color.normal == current.color.normal)
                 .forEach(neigh => {
-                    if (checked.indexOf(neigh) == -1) 
-                    {
+                    if (checked.indexOf(neigh) == -1) {
                         queue.push(neigh);
                         checked.push(neigh);
                     }
@@ -111,8 +110,8 @@ class ObjectManager {
         return _.chain(this._gameObjects)
             .filter(val => val.remove == false)
             .map(val => this.bfs(val))
-            .filter(q => q.length > 2 && 
-            (this.rowCountMatch(q[0], 3, Direction.Horizontal) || this.rowCountMatch(q[0], 3, Direction.Vertical)))
+            .filter(q => q.length > 2 &&
+                (this.rowCountMatch(q[0], 3, Direction.Horizontal) || this.rowCountMatch(q[0], 3, Direction.Vertical)))
             .map(val => _.chain(val).sortBy(q => q.x).sortBy(q => q.y).value())
             .groupBy(q => q[0].x + "|" + q[0].y).map(q => q[0])
             .value();
