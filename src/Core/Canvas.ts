@@ -9,7 +9,7 @@ class Canvas {
 
     static get Instance(): Canvas {
         if (Canvas._instance == null)
-            Canvas._instance = new Canvas(420, 640);
+            Canvas._instance = new Canvas(420, 660);
         return Canvas._instance;
     }
 
@@ -41,12 +41,25 @@ class Canvas {
         this._context.fillRect((this._width / 7) * 1.5, 0, this._width - (this._width / 7) * 3, this._height);
     }
 
+    public drawGameOverLine(): void {
+        this._context.setLineDash([38, 10]);
+        this._context.beginPath();
+        this._context.moveTo(((this._width / 7) * 1.5)-20, this._height/11);
+        this._context.lineTo(this._width - (this._width / 7)* 1.5, this._height/11);
+        this._context.lineWidth = 10;
+        this._context.strokeStyle = '#806895';
+        this._context.stroke();
+        this._context.closePath();
+    }
+
     public drawBlock(object: Block): void {
         this._context.fillStyle = object.color.normal;
-        this._context.fillRect(object.x, object.y, object.width, object.height);
-        if (object.ShouldHaveBorder) {
+        this._context.setTransform(1, 0, 0, 1, object.x+object.width / 2, object.y+object.height / 2);
+        this._context.rotate(object.rotation);
+        this._context.fillRect(-object.width / 2, -object.height / 2, object.width, object.height);  
+        if (object.ShouldHaveBorder && !object.shouldAnimate) {
             this._context.fillStyle = object.color.shadow;
-            this._context.fillRect(object.x, object.y + object.height / 10 * 9, object.width, object.height / 10);
+            this._context.fillRect(-object.width / 2, (-object.height/2)+object.height/10*9, object.width, object.height / 10);
         }
     }
 

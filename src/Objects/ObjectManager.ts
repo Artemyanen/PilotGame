@@ -8,7 +8,8 @@ class ObjectManager {
     private _gameObjects: Block[] = [];
     private static _instance: ObjectManager;
     private _myCanvas: Canvas;
-    public _isMoving : boolean = false;
+    public isMoving : boolean = false;
+    public isAnimating : boolean = false;
     private _startLinesCount : number = 2;
     private _blocksPerRowCount : number = 4;
     private _colors: Color[] = [
@@ -126,7 +127,15 @@ class ObjectManager {
     public waitForFalling = async (): Promise<boolean> => {
         while (true) {
             await this.timeout(100);
-            if (this._isMoving == false)
+            if (this.isMoving == false)
+                return true;
+        }
+    }
+
+    public waitForAnimation = async (): Promise<boolean> => {
+        while (true) {
+            await this.timeout(1000);
+            if (this.isAnimating == false)
                 return true;
         }
     }

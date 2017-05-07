@@ -25,10 +25,14 @@ class Game {
         const y = event.pageY - this.CanvasToptOffset;
 
         const clickedObject = this._manager.getObjectIn(x, y);
-        if (!clickedObject || this._manager._isMoving)
+        
+        if (!clickedObject || this._manager.isMoving || this._manager.isAnimating)
+        {
             return;
+        }
+            
         const sameColors = this._manager.bfs(clickedObject);
-        sameColors.forEach((val, ind) => val.remove = true);
+        sameColors.forEach((val, ind) => {val.shouldAnimate = true});
         this._manager.createNewLine();
         this._manager.upOldLines();
         while (true) {
@@ -36,12 +40,12 @@ class Game {
             const triples = this._manager.isTripleAvailable();
             if (triples.length == 0)
                 break;
-            triples.forEach(val => val.forEach(q => q.remove = true));
+            triples.forEach(val => val.forEach(q => q.shouldAnimate = true));
         }
         if (this._manager.GameObjects.length == 0)
             this._manager.createNewLine();
 
-        if (this._manager.GameObjects.some(q => q.y < 0 + q.height)) 
+        if (this._manager.GameObjects.some(q => q.y < 0 + 2*q.height)) 
             this.changeGameController(this.gameOverController, this.gameProcessController);
     }
 
@@ -68,16 +72,21 @@ class Game {
 
     private update(): void {
         this._manager.GameObjects = this._manager.GameObjects.filter(q => q.remove == false);
-        this._manager._isMoving = this._manager.GameObjects.filter(object => object.isDownPlaceEmpty()).length > 0;
+        this._manager.isAnimating = this._manager.GameObjects.filter(object => object.shouldAnimate).length > 0;
+        this._manager.isMoving = this._manager.GameObjects.filter(object => object.isDownPlaceEmpty()).length > 0;
         this._manager.GameObjects.forEach(object => object.update());
 
         this._myCanvas.clearWindow();
         this._myCanvas.drawBackground();
         this._myCanvas.drawSideColumn();
 
+        this._myCanvas.drawGameOverLine();
+
         this._manager.GameObjects.forEach((object) => {
             this._myCanvas.drawBlock(object);
         });
+
+        this._myCanvas.Context.setTransform(1, 0 ,0 , 1, 0, 0);
     }
 
     public start(): void {

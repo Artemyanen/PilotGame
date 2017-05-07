@@ -64,10 +64,11 @@ var Game = (function () {
                         x = event.pageX - this.CanvasLeftOffset;
                         y = event.pageY - this.CanvasToptOffset;
                         clickedObject = this._manager.getObjectIn(x, y);
-                        if (!clickedObject || this._manager._isMoving)
+                        if (!clickedObject || this._manager.isMoving || this._manager.isAnimating) {
                             return [2 /*return*/];
+                        }
                         sameColors = this._manager.bfs(clickedObject);
-                        sameColors.forEach(function (val, ind) { return val.remove = true; });
+                        sameColors.forEach(function (val, ind) { val.shouldAnimate = true; });
                         this._manager.createNewLine();
                         this._manager.upOldLines();
                         _a.label = 1;
@@ -79,12 +80,12 @@ var Game = (function () {
                         triples = this._manager.isTripleAvailable();
                         if (triples.length == 0)
                             return [3 /*break*/, 3];
-                        triples.forEach(function (val) { return val.forEach(function (q) { return q.remove = true; }); });
+                        triples.forEach(function (val) { return val.forEach(function (q) { return q.shouldAnimate = true; }); });
                         return [3 /*break*/, 1];
                     case 3:
                         if (this._manager.GameObjects.length == 0)
                             this._manager.createNewLine();
-                        if (this._manager.GameObjects.some(function (q) { return q.y < 0 + q.height; }))
+                        if (this._manager.GameObjects.some(function (q) { return q.y < 0 + 2 * q.height; }))
                             this.changeGameController(this.gameOverController, this.gameProcessController);
                         return [2 /*return*/];
                 }
@@ -126,14 +127,17 @@ var Game = (function () {
     Game.prototype.update = function () {
         var _this = this;
         this._manager.GameObjects = this._manager.GameObjects.filter(function (q) { return q.remove == false; });
-        this._manager._isMoving = this._manager.GameObjects.filter(function (object) { return object.isDownPlaceEmpty(); }).length > 0;
+        this._manager.isAnimating = this._manager.GameObjects.filter(function (object) { return object.shouldAnimate; }).length > 0;
+        this._manager.isMoving = this._manager.GameObjects.filter(function (object) { return object.isDownPlaceEmpty(); }).length > 0;
         this._manager.GameObjects.forEach(function (object) { return object.update(); });
         this._myCanvas.clearWindow();
         this._myCanvas.drawBackground();
         this._myCanvas.drawSideColumn();
+        this._myCanvas.drawGameOverLine();
         this._manager.GameObjects.forEach(function (object) {
             _this._myCanvas.drawBlock(object);
         });
+        this._myCanvas.Context.setTransform(1, 0, 0, 1, 0, 0);
     };
     Game.prototype.start = function () {
         this.pulse(null);
@@ -154,7 +158,7 @@ var Canvas = (function () {
     Object.defineProperty(Canvas, "Instance", {
         get: function () {
             if (Canvas._instance == null)
-                Canvas._instance = new Canvas(420, 640);
+                Canvas._instance = new Canvas(420, 660);
             return Canvas._instance;
         },
         enumerable: true,
@@ -195,12 +199,24 @@ var Canvas = (function () {
         this._context.fillStyle = '#60427a';
         this._context.fillRect((this._width / 7) * 1.5, 0, this._width - (this._width / 7) * 3, this._height);
     };
+    Canvas.prototype.drawGameOverLine = function () {
+        this._context.setLineDash([38, 10]);
+        this._context.beginPath();
+        this._context.moveTo(((this._width / 7) * 1.5) - 20, this._height / 11);
+        this._context.lineTo(this._width - (this._width / 7) * 1.5, this._height / 11);
+        this._context.lineWidth = 10;
+        this._context.strokeStyle = '#806895';
+        this._context.stroke();
+        this._context.closePath();
+    };
     Canvas.prototype.drawBlock = function (object) {
         this._context.fillStyle = object.color.normal;
-        this._context.fillRect(object.x, object.y, object.width, object.height);
-        if (object.ShouldHaveBorder) {
+        this._context.setTransform(1, 0, 0, 1, object.x + object.width / 2, object.y + object.height / 2);
+        this._context.rotate(object.rotation);
+        this._context.fillRect(-object.width / 2, -object.height / 2, object.width, object.height);
+        if (object.ShouldHaveBorder && !object.shouldAnimate) {
             this._context.fillStyle = object.color.shadow;
-            this._context.fillRect(object.x, object.y + object.height / 10 * 9, object.width, object.height / 10);
+            this._context.fillRect(-object.width / 2, (-object.height / 2) + object.height / 10 * 9, object.width, object.height / 10);
         }
     };
     Canvas.prototype.clearWindow = function () {
@@ -258,7 +274,8 @@ var ObjectManager = (function () {
     function ObjectManager() {
         var _this = this;
         this._gameObjects = [];
-        this._isMoving = false;
+        this.isMoving = false;
+        this.isAnimating = false;
         this._startLinesCount = 2;
         this._blocksPerRowCount = 4;
         this._colors = [
@@ -282,7 +299,22 @@ var ObjectManager = (function () {
                         return [4 /*yield*/, this.timeout(100)];
                     case 1:
                         _a.sent();
-                        if (this._isMoving == false)
+                        if (this.isMoving == false)
+                            return [2 /*return*/, true];
+                        return [3 /*break*/, 0];
+                    case 2: return [2 /*return*/];
+                }
+            });
+        }); };
+        this.waitForAnimation = function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!true) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.timeout(1000)];
+                    case 1:
+                        _a.sent();
+                        if (this.isAnimating == false)
                             return [2 /*return*/, true];
                         return [3 /*break*/, 0];
                     case 2: return [2 /*return*/];
@@ -412,9 +444,15 @@ var Block = (function () {
         this.color = color;
         this.height = Canvas_1["default"].Instance.Width / 7;
         this.width = Canvas_1["default"].Instance.Width / 7;
+        this.rotation = 0;
+        this.currentAnimationTime = 0;
         this.remove = false;
+        this.shouldAnimate = false;
         this._manager = ObjectManager_1["default"].Instance;
         this._canvas = Canvas_1["default"].Instance;
+        this.easeOutQuint = function (currentTime, startValue, changeInValue, duration) {
+            return changeInValue * ((currentTime = currentTime / duration - 1) * currentTime * currentTime * currentTime * currentTime + 1) + startValue;
+        };
     }
     Object.defineProperty(Block.prototype, "ShouldHaveBorder", {
         get: function () {
@@ -441,8 +479,20 @@ var Block = (function () {
             this.y < this._canvas.Height - this.height);
     };
     Block.prototype.update = function () {
-        if (this.isDownPlaceEmpty()) {
-            this.y += Math.floor(this.height * Game_1["default"].dt) * 6;
+        if (this.isDownPlaceEmpty() && !this._manager.isAnimating) {
+            this.y += Math.floor(this.height * Game_1["default"].dt) * 15;
+        }
+        if (this.shouldAnimate) {
+            this.height = this.easeOutQuint(this.currentAnimationTime, this.height, -this.height, 8);
+            this.width = this.easeOutQuint(this.currentAnimationTime, this.width, -this.width, 8);
+            this.x = this.easeOutQuint(this.currentAnimationTime, this.x, this.width / 2, 8);
+            this.y = this.easeOutQuint(this.currentAnimationTime, this.y, this.height / 2, 8);
+            this.currentAnimationTime += 1.5 * Game_1["default"].dt;
+            this.rotation += 0.1;
+            if (this.currentAnimationTime >= 0.5) {
+                this.shouldAnimate = false;
+                this.remove = true;
+            }
         }
     };
     return Block;
