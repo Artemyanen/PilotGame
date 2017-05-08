@@ -41,6 +41,7 @@ class Game {
             if (triples.length == 0)
                 break;
             triples.forEach(val => val.forEach(q => q.shouldAnimate = true));
+            this._myCanvas.StartShaking();
         }
         if (this._manager.GameObjects.length == 0)
             this._manager.createNewLine();
@@ -70,16 +71,16 @@ class Game {
         window.requestAnimationFrame(this.pulse);
     }
 
-    private update(): void {
+    private async update(): Promise<void> {
         this._manager.GameObjects = this._manager.GameObjects.filter(q => q.remove == false);
         this._manager.isAnimating = this._manager.GameObjects.filter(object => object.shouldAnimate).length > 0;
         this._manager.isMoving = this._manager.GameObjects.filter(object => object.isDownPlaceEmpty()).length > 0;
         this._manager.GameObjects.forEach(object => object.update());
 
         this._myCanvas.clearWindow();
+        this._myCanvas.preShake();
         this._myCanvas.drawBackground();
         this._myCanvas.drawSideColumn();
-
         this._myCanvas.drawGameOverLine();
 
         this._manager.GameObjects.forEach((object) => {
@@ -87,6 +88,7 @@ class Game {
         });
 
         this._myCanvas.Context.setTransform(1, 0 ,0 , 1, 0, 0);
+        this._myCanvas.postShake();
     }
 
     public start(): void {

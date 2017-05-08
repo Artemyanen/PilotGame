@@ -81,6 +81,7 @@ var Game = (function () {
                         if (triples.length == 0)
                             return [3 /*break*/, 3];
                         triples.forEach(function (val) { return val.forEach(function (q) { return q.shouldAnimate = true; }); });
+                        this._myCanvas.StartShaking();
                         return [3 /*break*/, 1];
                     case 3:
                         if (this._manager.GameObjects.length == 0)
@@ -125,19 +126,26 @@ var Game = (function () {
         document.addEventListener('click', on);
     };
     Game.prototype.update = function () {
-        var _this = this;
-        this._manager.GameObjects = this._manager.GameObjects.filter(function (q) { return q.remove == false; });
-        this._manager.isAnimating = this._manager.GameObjects.filter(function (object) { return object.shouldAnimate; }).length > 0;
-        this._manager.isMoving = this._manager.GameObjects.filter(function (object) { return object.isDownPlaceEmpty(); }).length > 0;
-        this._manager.GameObjects.forEach(function (object) { return object.update(); });
-        this._myCanvas.clearWindow();
-        this._myCanvas.drawBackground();
-        this._myCanvas.drawSideColumn();
-        this._myCanvas.drawGameOverLine();
-        this._manager.GameObjects.forEach(function (object) {
-            _this._myCanvas.drawBlock(object);
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                this._manager.GameObjects = this._manager.GameObjects.filter(function (q) { return q.remove == false; });
+                this._manager.isAnimating = this._manager.GameObjects.filter(function (object) { return object.shouldAnimate; }).length > 0;
+                this._manager.isMoving = this._manager.GameObjects.filter(function (object) { return object.isDownPlaceEmpty(); }).length > 0;
+                this._manager.GameObjects.forEach(function (object) { return object.update(); });
+                this._myCanvas.clearWindow();
+                this._myCanvas.preShake();
+                this._myCanvas.drawBackground();
+                this._myCanvas.drawSideColumn();
+                this._myCanvas.drawGameOverLine();
+                this._manager.GameObjects.forEach(function (object) {
+                    _this._myCanvas.drawBlock(object);
+                });
+                this._myCanvas.Context.setTransform(1, 0, 0, 1, 0, 0);
+                this._myCanvas.postShake();
+                return [2 /*return*/];
+            });
         });
-        this._myCanvas.Context.setTransform(1, 0, 0, 1, 0, 0);
     };
     Game.prototype.start = function () {
         this.pulse(null);
@@ -151,8 +159,14 @@ ___scope___.file("Core/Canvas.js", function(exports, require, module, __filename
 
 "use strict";
 exports.__esModule = true;
+var Game_1 = require("./Game");
 var Canvas = (function () {
     function Canvas(width, height) {
+        this.shouldShake = false;
+        this.shakeTime = 0;
+        this.shakeDuration = 0.5;
+        this.dx = 0;
+        this.dy = 0;
         this.initCanvas(width, height);
     }
     Object.defineProperty(Canvas, "Instance", {
@@ -191,6 +205,10 @@ var Canvas = (function () {
         enumerable: true,
         configurable: true
     });
+    Canvas.prototype.StartShaking = function () {
+        this.shouldShake = true;
+        this.shakeTime = 0;
+    };
     Canvas.prototype.drawBackground = function () {
         this._context.fillStyle = '#806895';
         this._context.fillRect(0, 0, this._width, this._height);
@@ -213,11 +231,29 @@ var Canvas = (function () {
         this._context.fillStyle = object.color.normal;
         this._context.setTransform(1, 0, 0, 1, object.x + object.width / 2, object.y + object.height / 2);
         this._context.rotate(object.rotation);
-        this._context.fillRect(-object.width / 2, -object.height / 2, object.width, object.height);
+        this._context.fillRect((-object.width / 2) + this.dx, (-object.height / 2) + this.dy, object.width, object.height);
         if (object.ShouldHaveBorder && !object.shouldAnimate) {
             this._context.fillStyle = object.color.shadow;
-            this._context.fillRect(-object.width / 2, (-object.height / 2) + object.height / 10 * 9, object.width, object.height / 10);
+            this._context.fillRect((-object.width / 2) + this.dx, ((-object.height / 2) + object.height / 10 * 9) + this.dy, object.width, object.height / 10);
         }
+    };
+    Canvas.prototype.preShake = function () {
+        if (this.shakeTime > this.shakeDuration || !this.shouldShake)
+            return;
+        this.shakeTime += Game_1["default"].dt;
+        this._context.save();
+        this.dx = Math.random() * 5;
+        this.dy = Math.random() * 5;
+        this._context.translate(this.dx, this.dy);
+    };
+    Canvas.prototype.postShake = function () {
+        if (this.shakeTime > this.shakeDuration || !this.shouldShake) {
+            this.shouldShake = false;
+            this.dx = 0;
+            this.dy = 0;
+            return;
+        }
+        this._context.restore();
     };
     Canvas.prototype.clearWindow = function () {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
