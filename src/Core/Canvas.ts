@@ -57,7 +57,7 @@ class Canvas {
         this._context.beginPath();
         this._context.moveTo(((this._width / 7) * 1.5)-20, this._height/11);
         this._context.lineTo(this._width - (this._width / 7)* 1.5, this._height/11);
-        this._context.lineWidth = 10;
+        this._context.lineWidth = 5;
         this._context.strokeStyle = '#806895';
         this._context.stroke();
         this._context.closePath();

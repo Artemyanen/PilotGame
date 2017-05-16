@@ -38,14 +38,14 @@ class Block {
             this.y < this._canvas.Height - this.height)
     }
 
-    private easeOutQuint = (currentTime: number, startValue: number, changeInValue: number, duration: number) => {
+    private easeOutQuint = (currentTime: number, startValue: number, changeInValue: number, duration: number): number => {
         return changeInValue*((currentTime=currentTime/duration-1)*currentTime*currentTime*currentTime*currentTime + 1) + startValue;
     }
 
     public update(): void {
         if (this.isDownPlaceEmpty() && !this._manager.isAnimating)
         {
-            this.y += Math.floor(this.height * Game.dt ) * 15;
+            this.y += 7.5;
         }
         if (this.shouldAnimate)
         {

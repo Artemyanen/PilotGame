@@ -46,12 +46,12 @@ class Game {
         if (this._manager.GameObjects.length == 0)
             this._manager.createNewLine();
 
-        if (this._manager.GameObjects.some(q => q.y < 0 + 2*q.height)) 
+        if (this._manager.GameObjects.some(object => object.y < 0 + 2*object.height)) 
             this.changeGameController(this.gameOverController, this.gameProcessController);
     }
 
     private gameOverController = (): void => {
-        this._manager.GameObjects.forEach(q => q.remove = true);
+        this._manager.GameObjects.forEach(object => object.remove = true);
         this._manager.createStartLines();
 
         this.changeGameController(this.gameProcessController, this.gameOverController);
@@ -72,7 +72,7 @@ class Game {
     }
 
     private async update(): Promise<void> {
-        this._manager.GameObjects = this._manager.GameObjects.filter(q => q.remove == false);
+        this._manager.GameObjects = this._manager.GameObjects.filter(object => object.remove == false);
         this._manager.isAnimating = this._manager.GameObjects.filter(object => object.shouldAnimate).length > 0;
         this._manager.isMoving = this._manager.GameObjects.filter(object => object.isDownPlaceEmpty()).length > 0;
         this._manager.GameObjects.forEach(object => object.update());

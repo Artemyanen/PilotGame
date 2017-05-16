@@ -21,8 +21,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t;
-    return { next: verb(0), "throw": verb(1), "return": verb(2) };
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -86,14 +86,14 @@ var Game = (function () {
                     case 3:
                         if (this._manager.GameObjects.length == 0)
                             this._manager.createNewLine();
-                        if (this._manager.GameObjects.some(function (q) { return q.y < 0 + 2 * q.height; }))
+                        if (this._manager.GameObjects.some(function (object) { return object.y < 0 + 2 * object.height; }))
                             this.changeGameController(this.gameOverController, this.gameProcessController);
                         return [2 /*return*/];
                 }
             });
         }); };
         this.gameOverController = function () {
-            _this._manager.GameObjects.forEach(function (q) { return q.remove = true; });
+            _this._manager.GameObjects.forEach(function (object) { return object.remove = true; });
             _this._manager.createStartLines();
             _this.changeGameController(_this.gameProcessController, _this.gameOverController);
         };
@@ -129,7 +129,7 @@ var Game = (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                this._manager.GameObjects = this._manager.GameObjects.filter(function (q) { return q.remove == false; });
+                this._manager.GameObjects = this._manager.GameObjects.filter(function (object) { return object.remove == false; });
                 this._manager.isAnimating = this._manager.GameObjects.filter(function (object) { return object.shouldAnimate; }).length > 0;
                 this._manager.isMoving = this._manager.GameObjects.filter(function (object) { return object.isDownPlaceEmpty(); }).length > 0;
                 this._manager.GameObjects.forEach(function (object) { return object.update(); });
@@ -222,7 +222,7 @@ var Canvas = (function () {
         this._context.beginPath();
         this._context.moveTo(((this._width / 7) * 1.5) - 20, this._height / 11);
         this._context.lineTo(this._width - (this._width / 7) * 1.5, this._height / 11);
-        this._context.lineWidth = 10;
+        this._context.lineWidth = 5;
         this._context.strokeStyle = '#806895';
         this._context.stroke();
         this._context.closePath();
@@ -275,8 +275,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t;
-    return { next: verb(0), "throw": verb(1), "return": verb(2) };
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -516,7 +516,7 @@ var Block = (function () {
     };
     Block.prototype.update = function () {
         if (this.isDownPlaceEmpty() && !this._manager.isAnimating) {
-            this.y += Math.floor(this.height * Game_1["default"].dt) * 15;
+            this.y += 7.5;
         }
         if (this.shouldAnimate) {
             this.height = this.easeOutQuint(this.currentAnimationTime, this.height, -this.height, 8);
